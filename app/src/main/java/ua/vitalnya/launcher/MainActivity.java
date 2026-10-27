@@ -20,7 +20,10 @@ import android.os.Looper;
 import android.net.Uri;
 import android.provider.Settings;
 import android.util.Base64;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.view.Window;
 import android.view.WindowManager;
 import android.webkit.JavascriptInterface;
@@ -46,6 +49,10 @@ import java.util.Set;
 public class MainActivity extends Activity {
 
     private WebView web;
+    private WebView mapView;          // вбудована онлайн-мапа (map.ukrainealarm.com)
+    private FrameLayout root;
+    private String mapUrl = null;
+    private long mapLoadedAt = 0;
     private SharedPreferences prefs;
     private final Map<String, String[]> iconCache = new HashMap<>();
 
@@ -70,9 +77,51 @@ public class MainActivity extends Activity {
         s.setCacheMode(WebSettings.LOAD_DEFAULT);
         web.setWebViewClient(new WebViewClient());
         web.addJavascriptInterface(new Bridge(), "Android");
-        setContentView(web);
+        root = new FrameLayout(this);
+        root.addView(web, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        setContentView(root);
         hideSystemUi();
         web.loadUrl("file:///android_asset/index.html");
+        web.requestFocus();
+    }
+
+    private void ensureMapView() {
+        if (mapView != null) return;
+        mapView = new WebView(this);
+        mapView.setBackgroundColor(Color.parseColor("#1b1d22"));
+        mapView.setFocusable(false);
+        mapView.setFocusableInTouchMode(false);
+        mapView.setDescendantFocusability(ViewGroup.FOCUS_BLOCK_DESCENDANTS);
+        WebSettings ms = mapView.getSettings();
+        ms.setJavaScriptEnabled(true);
+        ms.setDomStorageEnabled(true);
+        ms.setUseWideViewPort(true);
+        ms.setLoadWithOverviewMode(true);
+        ms.setMediaPlaybackRequiresUserGesture(true);
+        // десктопна версія сайту — повна мапа без мобільного меню
+        ms.setUserAgentString("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36");
+        mapView.setWebViewClient(new WebViewClient());
+        mapView.setVisibility(View.GONE);
+        root.addView(mapView, new FrameLayout.LayoutParams(10, 10));
+    }
+
+    /** x,y,w,h — у CSS-пікселях сторінки лаунчера */
+    private void placeMap(String url, float x, float y, float w, float h) {
+        ensureMapView();
+        float d = getResources().getDisplayMetrics().density;
+        FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(Math.round(w * d), Math.round(h * d));
+        lp.gravity = Gravity.TOP | Gravity.LEFT;
+        lp.leftMargin = Math.round(x * d);
+        lp.topMargin = Math.round(y * d);
+        mapView.setLayoutParams(lp);
+        mapView.setVisibility(View.VISIBLE);
+        long now = System.currentTimeMillis();
+        // перезавантажуємо сторінку раз на 10 хв, щоб не накопичувала памʼять
+        if (!url.equals(mapUrl) || now - mapLoadedAt > 10 * 60 * 1000) {
+            mapUrl = url;
+            mapLoadedAt = now;
+            mapView.loadUrl(url);
+        }
         web.requestFocus();
     }
 
@@ -283,6 +332,39 @@ public class MainActivity extends Activity {
                         startActivity(new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + getPackageName()))
                                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
                     } catch (Throwable ignored) { }
+                }
+            });
+        }
+
+        @JavascriptInterface
+        public void showMap(final String url, final float x, final float y, final float w, final float h) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    placeMap(url, x, y, w, h);
+                }
+            });
+        }
+
+        @JavascriptInterface
+        public void hideMap() {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (mapView != null) mapView.setVisibility(View.GONE);
+                }
+            });
+        }
+
+        @JavascriptInterface
+        public void reloadMap() {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (mapView != null && mapUrl != null) {
+                        mapLoadedAt = System.currentTimeMillis();
+                        mapView.loadUrl(mapUrl);
+                    }
                 }
             });
         }
