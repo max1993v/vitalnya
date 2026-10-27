@@ -1,0 +1,43 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'ua.vitalnya.launcher'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId 'ua.vitalnya.launcher'
+        minSdk 21
+        targetSdk 34
+        versionCode 1
+        versionName '1.0'
+    }
+
+    signingConfigs {
+        // постійний ключ у репозиторії — щоб оновлення ставились поверх старої версії
+        vitalnya {
+            storeFile file('vitalnya.jks')
+            storePassword 'vitalnya'
+            keyAlias 'vitalnya'
+            keyPassword 'vitalnya'
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.vitalnya
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    lint {
+        abortOnError false
+        checkReleaseBuilds false
+    }
+}
