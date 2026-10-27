@@ -1,6 +1,7 @@
 package ua.vitalnya.launcher;
 
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -14,6 +15,9 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.net.Uri;
 import android.provider.Settings;
 import android.util.Base64;
 import android.view.View;
@@ -202,6 +206,82 @@ public class MainActivity extends Activity {
                 public void run() {
                     try {
                         startActivity(new Intent(Settings.ACTION_SETTINGS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+                    } catch (Throwable ignored) { }
+                }
+            });
+        }
+
+        @JavascriptInterface
+        public boolean isDefaultHome() {
+            try {
+                Intent h = new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME);
+                ResolveInfo ri = getPackageManager().resolveActivity(h, PackageManager.MATCH_DEFAULT_ONLY);
+                return ri != null && ri.activityInfo != null && getPackageName().equals(ri.activityInfo.packageName);
+            } catch (Throwable t) {
+                return false;
+            }
+        }
+
+        @JavascriptInterface
+        public boolean canAutostart() {
+            if (Build.VERSION.SDK_INT < 29) return true;          // до Android 10 обмежень немає
+            return Settings.canDrawOverlays(MainActivity.this);   // Android 10+: потрібен дозвіл «поверх інших вікон»
+        }
+
+        /** Скидає вибір головного екрана і показує системне вікно «Який лаунчер використовувати». */
+        @JavascriptInterface
+        public void chooseHome() {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    final PackageManager pm = getPackageManager();
+                    final ComponentName fake = new ComponentName(MainActivity.this, FakeHome.class);
+                    try {
+                        pm.setComponentEnabledSetting(fake, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
+                        Intent h = new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(h);
+                    } catch (Throwable ignored) { }
+                    new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                pm.setComponentEnabledSetting(fake, PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
+                            } catch (Throwable ignored) { }
+                        }
+                    }, 1500);
+                }
+            });
+        }
+
+        @JavascriptInterface
+        public void openHomeSettings() {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    String[] actions = {Settings.ACTION_HOME_SETTINGS, "android.settings.MANAGE_DEFAULT_APPS_SETTINGS", Settings.ACTION_APPLICATION_SETTINGS};
+                    for (String a : actions) {
+                        try {
+                            startActivity(new Intent(a).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+                            return;
+                        } catch (Throwable ignored) { }
+                    }
+                }
+            });
+        }
+
+        @JavascriptInterface
+        public void openAutostartSettings() {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        startActivity(new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + getPackageName()))
+                                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+                        return;
+                    } catch (Throwable ignored) { }
+                    try {
+                        startActivity(new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + getPackageName()))
+                                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
                     } catch (Throwable ignored) { }
                 }
             });

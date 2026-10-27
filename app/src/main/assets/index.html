@@ -56,6 +56,7 @@ html,body{width:100%;height:100%;background:#0c0d10;overflow:hidden;color:var(--
 #grid path{fill:#2c3038;stroke:#14161a;stroke-width:.8;stroke-linejoin:round;transition:fill .4s}
 #grid path.p{fill:#a8792c}
 #grid path.f{fill:#c2403a}
+#grid path.u{fill:#d9772f}
 #grid path.home{stroke:#ffffff;stroke-width:2}
 #grid text{font-family:Roboto,Arial,sans-serif;font-size:9px;fill:rgba(255,255,255,.55);text-anchor:middle;pointer-events:none}
 #grid circle{fill:#59606c;stroke:#e9e6df;stroke-width:1.6}
@@ -64,7 +65,7 @@ html,body{width:100%;height:100%;background:#0c0d10;overflow:hidden;color:var(--
 #legend{position:absolute;left:20px;bottom:14px;font-size:13px;color:var(--dim)}
 #legend span{margin-right:18px}
 #legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px}
-#src{position:absolute;right:20px;bottom:14px;font-size:12px;color:#5d616a}
+#src{position:absolute;right:20px;top:19px;font-size:12px;color:#5d616a}
 
 /* dock */
 #dock{position:absolute;left:24px;right:24px;bottom:22px;height:118px;border-radius:26px;
@@ -149,6 +150,12 @@ html,body{width:100%;height:100%;background:#0c0d10;overflow:hidden;color:var(--
       <span class="btn fc" data-act="sound" id="bSound">🔔 Звук тривоги: увімк.</span>
       <span class="btn fc" data-act="reload">⟳ Оновити дані</span>
       <span class="btn fc" data-act="android">⚙ Налаштування Android</span>
+    </div>
+    <div class="sec">Запуск:</div>
+    <div>
+      <span class="btn fc" data-act="home" id="bHome">🏠 Зробити головним екраном</span>
+      <span class="btn fc" data-act="homeset">Налаштування головного екрана</span>
+      <span class="btn fc" data-act="autostart" id="bAuto">⏻ Автозапуск при ввімкненні</span>
     </div>
     <div class="sec">Мій регіон (для статусу й сповіщень):</div>
     <div id="regs"></div>
@@ -251,7 +258,7 @@ var alerts=null, prevAlerts=null, alertSince={}, logLines=[];
 function parseUbilling(body){ var j=JSON.parse(body), out={}, known=0; var s=j.states||j;
   Object.keys(s).forEach(function(k){ var id=regionId(k), v=s[k]; if(!id||!v||typeof v!=="object") return;
     if(!("alertnow" in v)&&!("alertNow" in v)&&!("enabled" in v)) return; known++;
-    if(v.alertnow||v.alertNow||v.enabled) out[id]="f"; });
+    if(v.alertnow||v.alertNow||v.enabled) out[id]="u"; });
   if(known<20) throw new Error("bad format"); return out; }
 function parseAlertsInUa(body){ var j=JSON.parse(body), out={}; if(!j||!(j.alerts instanceof Array)) throw new Error("bad format");
   (j.alerts||[]).forEach(function(a){ if(a.alert_type && a.alert_type!=="air_raid") return;
@@ -268,7 +275,7 @@ function fetchAlerts(){
     : httpGet("https://ubilling.net.ua/aerialalerts/").then(function(r){ try{ return r.status===200?{a:parseUbilling(r.body),src:"ubilling.net.ua"}:null; }catch(e){ return null; } });
   p.then(function(res){ if(res) applyAlerts(res.a,res.src); else noData(); }).catch(noData);
 }
-var lastOk=0;
+var lastOk=0, lastSrc="";
 function noData(){ $("src").textContent="помилка оновлення"; render(); }
 function isStale(){ return !lastOk || Date.now()-lastOk>150000; }
 
@@ -287,7 +294,11 @@ function applyAlerts(a,src){
 function render(src){
   var a=alerts||{}, n=0;
   REGIONS.forEach(function(r){ var s=a[r[0]], t=tiles[r[0]]; if(s) n++; if(!t) return;
-    t.setAttribute("class",(s==="f"?"f":s==="p"?"p":"")+(state.home===r[0]?" home":"")); });
+    t.setAttribute("class",(s==="f"?"f":s==="p"?"p":s==="u"?"u":"")+(state.home===r[0]?" home":"")); });
+  $("legend").innerHTML = (src||lastSrc)==="ubilling.net.ua"
+    ? '<span><i style="background:#d9772f"></i>тривога в області або її частині</span><span><i style="background:#2c3038"></i>спокійно</span>'
+    : '<span><i style="background:#c2403a"></i>тривога</span><span><i style="background:#a8792c"></i>частково</span><span><i style="background:#2c3038"></i>спокійно</span>';
+  if(src) lastSrc=src;
   var cd=$("cityDot"); if(cd) cd.setAttribute("class",(a.kyiv_city?"on":"")+(state.home==="kyiv_city"?" home":""));
   if(a.kyiv_city && !a.kyiv) n++;
   $("mapCnt").textContent="· "+n+(n===1?" регіон":n>=2&&n<=4?" регіони":" регіонів");
@@ -363,7 +374,10 @@ function closeOv(){ var any=false; ["ovApps","ovSet"].forEach(function(id){ if(i
   editMode=false; $("bEdit").textContent="✎ Редагувати док: вимк."; renderDock(); setFocus($("dockin").firstChild); return any; }
 function renderRegs(){ var c=$("regs"); c.innerHTML=""; var ids=["kyiv_city"].concat(REGIONS.map(function(r){return r[0]}));
   ids.forEach(function(id){ var b=document.createElement("span"); b.className="btn fc"+(state.home===id?" sel":""); b.setAttribute("data-reg",id); b.textContent=nameOf(id); c.appendChild(b); });
-  $("bSound").textContent="🔔 Звук тривоги: "+(state.sound?"увімк.":"вимк."); }
+  $("bSound").textContent="🔔 Звук тривоги: "+(state.sound?"увімк.":"вимк.");
+  var isHome=HAS_BRIDGE&&Android.isDefaultHome&&Android.isDefaultHome(), auto=HAS_BRIDGE&&Android.canAutostart&&Android.canAutostart();
+  $("bHome").textContent=isHome?"🏠 Головний екран: ✓ Вітальня":"🏠 Зробити головним екраном";
+  $("bAuto").textContent="⏻ Автозапуск при ввімкненні: "+(auto?"✓ увімк.":"дозволити"); }
 
 /* ---------- фокус і пульт ---------- */
 var focused=null;
@@ -399,9 +413,12 @@ function activate(el){ if(!el) return; var pkg=el.getAttribute("data-pkg"), act=
   if(act==="sound"){ state.sound=!state.sound; save("sound",state.sound); renderRegs(); }
   if(act==="reload"){ fetchAlerts(); loadWeather(); refreshApps(); toast("⟳ Оновлено"); }
   if(act==="android"&&HAS_BRIDGE) Android.openSettings();
+  if(act==="home"&&HAS_BRIDGE){ toast("Обери «Вітальня» → «Завжди»"); Android.chooseHome(); }
+  if(act==="homeset"&&HAS_BRIDGE) Android.openHomeSettings();
+  if(act==="autostart"&&HAS_BRIDGE){ if(Android.canAutostart()) toast("✓ Автозапуск уже увімкнено"); else { toast("Увімкни дозвіл для «Вітальня» і натисни «Назад»"); Android.openAutostartSettings(); } }
 }
 window.onTvBack=function(){ if(isOpen("alarm")){ hideAlarm(); return; } if(!closeOv()) setFocus($("dockin").firstChild); };
-window.onTvResume=function(){ refreshApps(); fetchAlerts(); };
+window.onTvResume=function(){ refreshApps(); fetchAlerts(); if(isOpen("ovSet")) renderRegs(); };
 document.addEventListener("keydown",function(e){
   if(actx&&actx.resume) actx.resume();
   if($("alarm").className==="show"){ hideAlarm(); e.preventDefault(); return; }
@@ -417,6 +434,7 @@ document.addEventListener("click",function(e){ var t=e.target; while(t&&t!==docu
   if(t&&t.classList){ setFocus(t); activate(t); } });
 
 setFocus($("bApps")); setTimeout(refreshApps, 50);
+setTimeout(function(){ try{ if(HAS_BRIDGE&&Android.isDefaultHome&&(!Android.isDefaultHome()||!Android.canAutostart())) toast("⚙ Налаштування → «Зробити головним екраном» і «Автозапуск»"); }catch(e){} }, 2500);
 if(DEMO && /alarm/.test(location.search)) setTimeout(showAlarm,300);
 </script>
 </body>
