@@ -100,9 +100,34 @@ public class MainActivity extends Activity {
         ms.setMediaPlaybackRequiresUserGesture(true);
         // десктопна версія сайту — повна мапа без мобільного меню
         ms.setUserAgentString("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36");
-        mapView.setWebViewClient(new WebViewClient());
+        mapView.setWebViewClient(new WebViewClient() {
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                super.onPageFinished(view, url);
+                String js = readAsset("mapfix.js");
+                if (js != null) view.evaluateJavascript(js, null);
+            }
+        });
         mapView.setVisibility(View.GONE);
         root.addView(mapView, new FrameLayout.LayoutParams(10, 10));
+    }
+
+    private String mapFixJs = null;
+
+    private String readAsset(String name) {
+        if (mapFixJs != null) return mapFixJs;
+        try {
+            InputStream in = getAssets().open(name);
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            byte[] buf = new byte[8192];
+            int n;
+            while ((n = in.read(buf)) > 0) out.write(buf, 0, n);
+            in.close();
+            mapFixJs = out.toString("UTF-8");
+        } catch (Throwable t) {
+            mapFixJs = null;
+        }
+        return mapFixJs;
     }
 
     /** x,y,w,h — у CSS-пікселях сторінки лаунчера */
@@ -411,6 +436,9 @@ public class MainActivity extends Activity {
                         }
                     } catch (Throwable t) {
                         code = 0;
+                        // текст помилки — щоб на екрані було видно справжню причину
+                        String m = t.getMessage();
+                        body = t.getClass().getSimpleName() + (m != null ? ": " + m : "");
                     } finally {
                         if (c != null) c.disconnect();
                     }
