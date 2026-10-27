@@ -1,59 +1,66 @@
-/* Прибирає спливаючі вікна й промо-банери з map.ukrainealarm.com, щоб було видно лише мапу. */
+/* Лишає на map.ukrainealarm.com тільки мапу: ховає шапку, меню, кнопки, банери й вікна. */
 (function () {
   if (window.__vitalnyaFix) return;
   window.__vitalnyaFix = true;
 
-  var TEXTS = ["Оновлена карта", "Віджет мапи", "ЗАВАНТАЖИТИ ВІДЖЕТ", "Завантажити віджет", "cookie", "Cookie"];
-
-  function isMap(el) {
-    return !!el.querySelector("canvas, .leaflet-container, .mapboxgl-map, .maplibregl-map");
+  function area(el) {
+    var r = el.getBoundingClientRect();
+    return r.width * r.height;
   }
-  function hide(el) {
-    if (el && el !== document.body && el !== document.documentElement && !isMap(el)) {
-      el.style.setProperty("display", "none", "important");
+
+  // шукаємо найбільший елемент мапи: svg з багатьма контурами, canvas або контейнер картографічної бібліотеки
+  function findMap() {
+    var best = null, bestA = 0;
+    var c = document.querySelectorAll("svg, canvas, .leaflet-container, .maplibregl-map, .mapboxgl-map");
+    for (var i = 0; i < c.length; i++) {
+      var el = c[i];
+      if (el.tagName.toLowerCase() === "svg" && el.querySelectorAll("path").length < 20) continue;
+      var a = area(el);
+      if (a > bestA) { bestA = a; best = el; }
     }
-  }
-  function posOf(el) {
-    try { return getComputedStyle(el).position; } catch (e) { return ""; }
+    if (!best || bestA < 40000) return null;
+    // піднімаємось до контейнера такого ж розміру — щоб зберегти позначки цілей поверх мапи
+    var cur = best;
+    while (cur.parentElement && cur.parentElement !== document.body && area(cur.parentElement) <= bestA * 1.2) cur = cur.parentElement;
+    return cur;
   }
 
-  function run() {
-    // 1) вікна з відомим текстом — ховаємо найвищий fixed/absolute контейнер, що не містить мапу
-    var nodes = document.querySelectorAll("div, section, aside, dialog");
-    for (var i = 0; i < nodes.length; i++) {
-      var el = nodes[i];
-      if (el.children.length > 6) continue;
-      var t = el.textContent || "";
-      var hit = false;
-      for (var k = 0; k < TEXTS.length; k++) { if (t.indexOf(TEXTS[k]) >= 0) { hit = true; break; } }
-      if (!hit) continue;
-      var target = null, cur = el;
-      while (cur && cur !== document.body) {
-        var p = posOf(cur);
-        if ((p === "fixed" || p === "absolute" || cur.getAttribute("role") === "dialog" || cur.tagName === "DIALOG") && !isMap(cur)) target = cur;
-        cur = cur.parentElement;
+  function isolate(map) {
+    // ховаємо всіх «сусідів» на шляху від мапи до body
+    var cur = map;
+    while (cur && cur !== document.body && cur.parentElement) {
+      var sib = cur.parentElement.children;
+      for (var i = 0; i < sib.length; i++) {
+        var s = sib[i];
+        if (s !== cur && !/^(script|style|link)$/i.test(s.tagName)) s.style.setProperty("display", "none", "important");
       }
-      hide(target);
+      cur = cur.parentElement;
     }
-    // 2) напівпрозорі «затемнення» на весь екран без мапи всередині
-    var all = document.body ? document.body.getElementsByTagName("*") : [];
-    var W = window.innerWidth, H = window.innerHeight;
-    for (var j = 0; j < all.length; j++) {
-      var e = all[j];
-      if (posOf(e) !== "fixed") continue;
-      var r = e.getBoundingClientRect();
-      if (r.width >= W * 0.9 && r.height >= H * 0.9 && !isMap(e) && (e.textContent || "").trim().length < 400) hide(e);
-    }
-    // 3) кнопки «закрити» у діалогах
-    var btns = document.querySelectorAll("[role=dialog] button, dialog button, [aria-modal=true] button");
-    for (var b = 0; b < btns.length; b++) {
-      var lab = (btns[b].getAttribute("aria-label") || "") + (btns[b].textContent || "");
-      if (/close|закрити|×|✕/i.test(lab)) { try { btns[b].click(); } catch (x) {} }
-    }
-    try { document.body.style.overflow = "hidden"; } catch (x) {}
+    // всередині контейнера мапи ховаємо кнопки, легенди й банери (усе, що не є частиною самої мапи)
+    var inner = map.querySelectorAll("button, [role=button], [class*='control'], [class*='Control'], [class*='banner'], [class*='Banner'], [class*='legend'], [class*='Legend'], [class*='attribution']");
+    for (var j = 0; j < inner.length; j++) inner[j].style.setProperty("display", "none", "important");
+    // розтягуємо мапу на все вікно
+    var st = map.style;
+    st.setProperty("position", "fixed", "important");
+    st.setProperty("left", "0", "important");
+    st.setProperty("top", "0", "important");
+    st.setProperty("width", "100vw", "important");
+    st.setProperty("height", "100vh", "important");
+    st.setProperty("margin", "0", "important");
+    st.setProperty("transform", "none", "important");
+    st.setProperty("z-index", "2147483000", "important");
+    var svg = map.tagName.toLowerCase() === "svg" ? map : map.querySelector(":scope > svg");
+    if (svg) { svg.style.setProperty("width", "100%", "important"); svg.style.setProperty("height", "100%", "important"); }
+    document.documentElement.style.background = "#1b1d22";
+    document.body.style.background = "#1b1d22";
+    document.body.style.overflow = "hidden";
+    try { window.dispatchEvent(new Event("resize")); } catch (e) {}
   }
 
-  run();
   var n = 0;
-  var timer = setInterval(function () { run(); if (++n > 40) clearInterval(timer); }, 750);
+  var timer = setInterval(function () {
+    var map = findMap();
+    if (map) isolate(map);
+    if (++n > 60) clearInterval(timer);   // ~45 с: сайт може домальовувати шари й вікна
+  }, 750);
 })();
