@@ -67,7 +67,7 @@ html,body{width:100%;height:100%;background:#0c0d10;overflow:hidden;color:var(--
 #legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px}
 #map.fc.on{transform:none;box-shadow:0 0 0 3px var(--focus)}
 #map.ext #grid svg,#map.ext #legend{visibility:hidden}
-#src{position:absolute;right:20px;top:19px;max-width:260px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:12px;color:#5d616a}
+#src{position:absolute;right:20px;top:19px;max-width:300px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:12px;color:#5d616a}
 
 /* dock */
 #dock{position:absolute;left:24px;right:24px;bottom:22px;height:118px;border-radius:26px;
@@ -204,7 +204,7 @@ var DEMO = /demo/.test(location.search);
 /* ---------- сховище ---------- */
 function load(k,d){ try{ var v = HAS_BRIDGE ? Android.load(k) : localStorage.getItem(k); return v ? JSON.parse(v) : d; }catch(e){ return d; } }
 function save(k,v){ try{ var s=JSON.stringify(v); if(HAS_BRIDGE) Android.save(k,s); else localStorage.setItem(k,s); }catch(e){} }
-var state = { home: load("home", CONFIG.homeRegion), sound: load("sound", true), pins: load("pins", null), mapMode: load("mapMode", "ual") };
+var state = { home: load("home", CONFIG.homeRegion), sound: load("sound", true), pins: load("pins", null), mapMode: load("mapMode2", "own") };
 
 /* ---------- масштаб під екран ---------- */
 function fit(){ var s=Math.min(innerWidth/1280, innerHeight/720); var st=$("stage");
@@ -287,14 +287,15 @@ function demoAlerts(){ var o={}; ["khr","sum","don","zap","dnp","lug","crimea"].
 /* ubilling має кілька підджерел — якщо одне лежить, пробуємо наступне */
 var UB_SOURCES=["","aiu","ual","jaam","skog","klimenko"], ubIdx=0, lastErr="", ubProto="https";
 function fetchUbilling(){
-  var tries=0;
+  var tries=UB_SOURCES.length-1;   // одна спроба за цикл (раз на 30 с), при невдачі — наступне джерело в наступному циклі
   function attempt(){
     var src=UB_SOURCES[ubIdx], url=ubProto+"://ubilling.net.ua/aerialalerts/"+(src?"?source="+src:"");
     return httpGet(url).then(function(r){
-      if(r.status===200){ try{ return {a:parseUbilling(r.body), src:"ubilling"+(ubProto==="http"?" (http)":"")+(src?" · "+src:"")}; }catch(e){ lastErr="формат"; } }
+      if(r.status===200){ try{ return {a:parseUbilling(r.body), src:"ubilling"+(ubProto==="http"?" (http)":"")+(src?" · "+src:"")}; }
+        catch(e){ lastErr="формат «"+(src||"default")+"»: "+String(r.body||"").replace(/\s+/g," ").slice(0,45); } }
       else lastErr = r.status ? "HTTP "+r.status : (r.body ? String(r.body).slice(0,70) : "немає зʼєднання");
       if(r.status===429) return null;              // ліміт запитів — не смикаємо далі, чекаємо наступного циклу
-      if(r.status===0 && tries===0){ ubProto = ubProto==="https" ? "http" : "https"; tries++;   // https не пройшов — пробуємо http (і навпаки)
+      if(r.status===0 && ubProto==="https"){ ubProto = ubProto==="https" ? "http" : "https"; tries++;   // https не пройшов — пробуємо http (і навпаки)
         return new Promise(function(res){ setTimeout(res,700); }).then(attempt); }
       tries++; ubIdx=(ubIdx+1)%UB_SOURCES.length;
       if(tries>=UB_SOURCES.length) return null;
@@ -446,7 +447,7 @@ function activate(el){ if(!el) return; var pkg=el.getAttribute("data-pkg"), act=
     else launch(pkg); return; }
   if(reg){ state.home=reg; save("home",reg); renderRegs(); setFocus($("regs").querySelector("[data-reg='"+reg+"']")); render(); return; }
   if(act==="mapfull"){ if(state.mapMode==="ual"&&HAS_BRIDGE){ mapFull=true; syncMap(); toast("Назад — повернутись"); } return; }
-  if(act==="mapmode"){ state.mapMode=state.mapMode==="ual"?"own":"ual"; save("mapMode",state.mapMode); renderRegs(); return; }
+  if(act==="mapmode"){ state.mapMode=state.mapMode==="ual"?"own":"ual"; save("mapMode2",state.mapMode); renderRegs(); return; }
   if(act==="apps") openOv("ovApps");
   if(act==="settings") openOv("ovSet");
   if(act==="edit"){ editMode=!editMode; el.textContent="✎ Редагувати док: "+(editMode?"увімк. (OK — ★ закріпити/зняти)":"вимк."); }
