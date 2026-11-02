@@ -47,6 +47,34 @@ body.lite .glass{background:rgba(18,36,140,.55)}
 #notch.alarm .nt .nl{position:absolute;left:20px} #notch.alarm .nt .nr{position:absolute;right:20px;color:#fff}
 #notch.alarm .nt b{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--red);margin-right:8px;vertical-align:0;animation:pulse .8s infinite alternate}
 #toast{display:none}
+#notch.on{box-shadow:0 0 0 2px rgba(255,255,255,.85),0 6px 20px rgba(0,0,0,.5)}
+#notch.hov{width:330px;margin-left:-165px}
+#notch.hov .nt{top:0;line-height:32px;font-size:13px;font-weight:500;opacity:1;color:rgba(255,255,255,.8)}
+#notch.hov .nt .nl{position:absolute;left:20px} #notch.hov .nt .nr{position:absolute;right:20px}
+#notch.open{width:780px;margin-left:-390px;height:392px;border-radius:0 0 38px 38px;box-shadow:0 24px 60px rgba(0,0,30,.6)}
+#notch.open.on{box-shadow:0 24px 60px rgba(0,0,30,.6)}
+#notch.open .nt{opacity:0}
+#npanel{position:absolute;left:20px;right:20px;top:42px;opacity:0;visibility:hidden;transition:opacity .2s}
+#notch.open #npanel{opacity:1;visibility:visible;transition-delay:.2s}
+.nrow{white-space:nowrap;margin-bottom:10px}
+.ncard{display:inline-block;vertical-align:top;white-space:normal;background:#1c1c1e;border-radius:20px;padding:14px 16px;margin-right:10px;overflow:hidden}
+.ncard:last-child{margin-right:0}
+.ncard .lbl{font-size:11px;margin-bottom:6px}
+#ncA{width:420px;height:142px} #ncW{width:310px;height:142px}
+#ncL{width:420px;height:132px} #ncS{width:310px;height:132px}
+#ncA .big{font-size:24px;font-weight:700} #ncA .big.al{color:#ff6b61}
+#ncA .sub{font-size:13px;color:var(--dim);margin-top:4px}
+#ncA .regs{font-size:13px;margin-top:8px;line-height:18px;max-height:38px;overflow:hidden;color:rgba(255,255,255,.88)}
+#ncW .now{font-size:15px;font-weight:600} #ncW .now b{font-size:30px;font-weight:300;margin-right:8px;vertical-align:-3px}
+#ncW .hrs{display:table;width:100%;margin-top:10px} #ncW .hrs div{display:table-cell;text-align:center;font-size:12px;color:var(--dim)}
+#ncW .hrs i{display:block;font-style:normal;font-size:18px;margin:3px 0} #ncW .hrs b{color:#fff;font-weight:600;font-size:13px}
+#ncL p{font-size:13px;line-height:21px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#ncL .dot{width:7px;height:7px;margin-right:8px;box-shadow:none} #ncL .t{color:var(--dim);margin-right:6px}
+#ncS p{font-size:13px;line-height:21px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--dim)} #ncS p b{color:#fff;font-weight:500}
+.nbtns{white-space:nowrap;margin-top:4px}
+.nb{display:inline-block;padding:10px 16px;border-radius:22px;background:#2c2c2e;font-size:14px;margin-right:8px;color:#fff}
+.nb.on{background:#fff;color:#000}
+.nb.act{background:var(--blue)} .nb.act.on{background:#fff;color:#000}
 
 /* ---------- віджети ---------- */
 #wClock{left:28px;top:52px;width:300px;height:176px;padding:18px 22px}
@@ -205,7 +233,14 @@ body.lite .ov{background:rgba(6,16,80,.94)}
       <span id="mbTime">—</span>
     </div>
   </div>
-  <div id="notch"><div class="cam"></div><div class="nt" id="notchTxt"></div></div>
+  <div id="notch" class="fc" data-act="notch"><div class="cam"></div><div class="nt" id="notchTxt"></div>
+    <div id="npanel">
+      <div class="nrow"><div class="ncard" id="ncA"></div><div class="ncard" id="ncW"></div></div>
+      <div class="nrow"><div class="ncard" id="ncL"></div><div class="ncard" id="ncS"></div></div>
+      <div class="nbtns">
+        <span class="nb fc" data-act="nsound" id="nbSound">🔔 Звук</span><span class="nb fc" data-act="reload">⟳ Оновити</span><span class="nb fc" data-act="nmap" id="nbMap">🗺 Мапа на весь екран</span><span class="nb fc" data-act="settings">⚙ Налаштування</span><span class="nb fc" data-act="nclose">▴ Сховати</span>
+      </div>
+    </div></div>
   <div id="toast"></div>
 
   <div id="wClock" class="glass">
@@ -241,7 +276,7 @@ body.lite .ov{background:rgba(6,16,80,.94)}
   <div id="dock">
     <div id="dockwrap"><div id="dockclip"><div id="dockin"></div></div></div><div id="dsep"></div><div class="app sys fc" id="bApps" data-act="apps"><div class="ico tr"><svg viewBox="0 0 70 70"><defs><linearGradient id="lp" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff7a59"/><stop offset=".5" stop-color="#c04dff"/><stop offset="1" stop-color="#2f6bff"/></linearGradient></defs><rect width="70" height="70" rx="15.75" fill="url(#lp)"/><g fill="#fff" opacity=".95"><rect x="15" y="15" width="10" height="10" rx="3"/><rect x="30" y="15" width="10" height="10" rx="3"/><rect x="45" y="15" width="10" height="10" rx="3"/><rect x="15" y="30" width="10" height="10" rx="3"/><rect x="30" y="30" width="10" height="10" rx="3"/><rect x="45" y="30" width="10" height="10" rx="3"/><rect x="15" y="45" width="10" height="10" rx="3"/><rect x="30" y="45" width="10" height="10" rx="3"/><rect x="45" y="45" width="10" height="10" rx="3"/></g></svg></div><div class="lb">Усі програми</div><div class="run"></div></div><div class="app sys fc" id="bSet" data-act="settings"><div class="ico tr"><svg viewBox="0 0 70 70"><defs><linearGradient id="gs" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e6e8ee"/><stop offset="1" stop-color="#8e939f"/></linearGradient></defs><rect width="70" height="70" rx="15.75" fill="url(#gs)"/><circle cx="35" cy="35" r="21" fill="#4a4f5a"/><g fill="#d8dbe2"><path d="M35 17l3 6h-6zM35 53l-3-6h6zM17 35l6-3v6zM53 35l-6 3v-6zM22.3 22.3l6.4 2.1-4.2 4.2zM47.7 47.7l-6.4-2.1 4.2-4.2zM47.7 22.3l-2.1 6.4-4.2-4.2zM22.3 47.7l2.1-6.4 4.2 4.2z"/></g><circle cx="35" cy="35" r="12" fill="#d8dbe2"/><circle cx="35" cy="35" r="6" fill="#4a4f5a"/></svg></div><div class="lb">Налаштування</div><div class="run"></div></div>
   </div>
-  <div id="hint"><b>← →</b>вибір · <b>OK</b>відкрити · <b>↑</b>мапа · <b>Назад</b>до доку</div>
+  <div id="hint"><b>← →</b>вибір · <b>OK</b>відкрити · <b>↑</b>мапа · <b>↑↑</b>шторка · <b>Назад</b>до доку</div>
 
   <div id="ovApps" class="ov">
     <h2>Усі програми</h2>
@@ -303,6 +338,7 @@ var STEMS = [["київськ","kyiv"],["київ","kyiv_city"],["крим","cri
 function regionId(name){ var n=String(name||"").toLowerCase(); for(var i=0;i<STEMS.length;i++){ if(n.indexOf(STEMS[i][0])>=0) return STEMS[i][1]; } return null; }
 
 var $=function(id){return document.getElementById(id)};
+var NS={open:false,toast:"",alarm:false}, notchTimer, logAll=[], focused=null;
 var HAS_BRIDGE = !!(window.Android && window.Android.httpGet);
 var DEMO = /demo/.test(location.search);
 
@@ -357,17 +393,21 @@ function wcode(c){ if(c===0)return"ясно"; if(c<=2)return"мінлива хм
   if(c<=57)return"мряка"; if(c<=67)return"дощ"; if(c<=77)return"сніг"; if(c<=82)return"злива"; if(c<=86)return"снігопад"; return"гроза"; }
 function loadWeather(){
   var u="https://api.open-meteo.com/v1/forecast?latitude="+CONFIG.lat+"&longitude="+CONFIG.lon+
-    "&current=temperature_2m,weather_code&daily=temperature_2m_max,temperature_2m_min&timezone=Europe%2FKyiv&forecast_days=1";
+    "&current=temperature_2m,weather_code&daily=temperature_2m_max,temperature_2m_min&hourly=temperature_2m,weather_code&timezone=Europe%2FKyiv&forecast_days=2";
   $("wCity").textContent=CONFIG.city;
-  if(DEMO){ showWeather(12,3,13,7); return; }
+  if(DEMO){ var H=new Date().getHours(); HOURLY=[0,1,2,3,4,5].map(function(i){ return {h:(H+i)%24,t:12-i,c:[3,3,61,61,2,0][i]}; }); showWeather(12,3,13,7); return; }
   httpGet(u).then(function(r){ try{ var j=JSON.parse(r.body);
+    try{ var now=new Date(), key=now.getFullYear()+"-"+pad(now.getMonth()+1)+"-"+pad(now.getDate())+"T"+pad(now.getHours())+":00",
+      i0=j.hourly.time.indexOf(key); HOURLY=[]; if(i0>=0) for(var i=i0;i<i0+6&&i<j.hourly.time.length;i++)
+      HOURLY.push({h:+j.hourly.time[i].slice(11,13),t:j.hourly.temperature_2m[i],c:j.hourly.weather_code[i]}); }catch(e){}
     showWeather(j.current.temperature_2m,j.current.weather_code,j.daily.temperature_2m_max[0],j.daily.temperature_2m_min[0]);
   }catch(e){ $("wCond").textContent="погода недоступна"; } });
 }
 function wicon(c){ var n=new Date().getHours(), night=n<6||n>=20;
   if(c===0) return night?"🌙":"☀️"; if(c<=2) return night?"☁️":"⛅"; if(c===3) return "☁️"; if(c<=48) return "🌫️";
   if(c<=67||(c>=80&&c<=82)) return "🌧️"; if(c<=77||(c>=85&&c<=86)) return "❄️"; return "⛈️"; }
-function showWeather(t,c,mx,mn){ t=Math.round(t);
+var HOURLY=[], WX=null;
+function showWeather(t,c,mx,mn){ t=Math.round(t); WX={t:t,c:c,mx:Math.round(mx),mn:Math.round(mn)}; if(NS.open) renderNotch();
   $("wTemp").textContent=t+"°"; $("wIco").textContent=wicon(c);
   var cond=wcode(c); $("wCond").textContent=cond.charAt(0).toUpperCase()+cond.slice(1);
   $("wHL").textContent="Макс.:"+Math.round(mx)+"° Мін.:"+Math.round(mn)+"°";
@@ -392,7 +432,7 @@ function syncMap(){
   var useExt = HAS_BRIDGE && state.mapMode==="ual";
   $("map").className = "glass fc"+(useExt?" ext":"")+(focused===$("map")?" on":"");
   if(!HAS_BRIDGE) return;
-  var covered = isOpen("ovApps")||isOpen("ovSet")||$("alarm").className==="show";
+  var covered = NS.open||isOpen("ovApps")||isOpen("ovSet")||$("alarm").className==="show";
   if(!useExt || covered){ Android.hideMap(); return; }
   if(mapFull){ Android.showMap(MAP_URL, 0, 0, innerWidth, innerHeight); return; }
   var m=$("map").getBoundingClientRect(), g=$("grid").getBoundingClientRect(), pad=6*(m.width/528);
@@ -484,12 +524,40 @@ var SHORT={kyiv_city:"Київ"};
 function updateBar(a,home){ var mb=$("mbAlert"), stale=isStale();
   mb.className = stale ? "stale" : (a[home] ? "on" : "");
   $("mbAlertTxt").textContent = stale ? "немає даних" : (a[home] ? "Тривога" : "Тиша");
-  var n=$("notch");
-  if(!stale && a[home]){ var since=alertSince[home], m=since?Math.round((Date.now()-since)/60000):0;
-    if(!notchBusy){ $("notchTxt").innerHTML='<span class="nl"><b></b>Тривога</span><span class="nr">'+nameOf(home)+(m?" · "+m+" хв":"")+'</span>'; n.className="alarm"; } }
-  else if(!notchBusy) n.className=""; }
-var notchBusy=false, notchTimer;
-function addLog(html){ logLines.unshift(html); logLines=logLines.slice(0,4); $("log").innerHTML=logLines.map(function(l){return"<p>"+l+"</p>"}).join(""); }
+  NS.alarm = !stale && !!a[home]; paintNotch(); if(NS.open) renderNotch(); }
+/* ---------- шторка: стани ---------- */
+function minsSince(k){ var s=alertSince[k]; return s?Math.round((Date.now()-s)/60000):0; }
+function paintNotch(){ var n=$("notch"), c="fc"+(focused===n?" on":""), t=$("notchTxt"), home=state.home;
+  if(NS.open) c+=" open";
+  else if(NS.toast){ c+=" wide"; t.textContent=NS.toast; }
+  else if(NS.alarm){ c+=" alarm"; var m=minsSince(home); t.innerHTML='<span class="nl"><b></b>Тривога</span><span class="nr">'+nameOf(home)+(m?" · "+m+" хв":"")+'</span>'; }
+  else if(focused===n){ c+=" hov"; t.innerHTML='<span class="nl">▾ Центр керування</span><span class="nr">OK</span>'; }
+  else t.textContent="";
+  n.className=c; }
+function openNotch(){ NS.open=true; renderNotch(); paintNotch(); syncMap(); setTimeout(function(){ setFocus($("npanel").querySelector(".fc")); },10); }
+function closeNotch(){ NS.open=false; setFocus($("notch")); paintNotch(); syncMap(); }
+function esc(x){ return String(x).replace(/[&<>"]/g,function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
+function renderNotch(){
+  var a=alerts||{}, home=state.home, stale=isStale(), on=Object.keys(a);
+  var big = stale ? '<div class="big">Немає даних</div><div class="sub">'+(alerts?"останнє оновлення о "+pad(new Date(lastOk).getHours())+":"+pad(new Date(lastOk).getMinutes()):"чекаю на звʼязок…")+'</div>'
+    : a[home] ? '<div class="big al">● Тривога · '+esc(nameOf(home))+'</div><div class="sub">триває '+(minsSince(home)||"<1")+' хв · пройдіть до укриття</div>'
+    : '<div class="big">✓ Тиша · '+esc(nameOf(home))+'</div><div class="sub">у твоєму регіоні тривоги немає</div>';
+  var names=on.map(function(k){ for(var i=0;i<REGIONS.length;i++) if(REGIONS[i][0]===k) return REGIONS[i][1]; return k==="kyiv_city"?"Київ":nameOf(k); });
+  $("ncA").innerHTML='<div class="lbl">Повітряна тривога</div>'+big+'<div class="regs">'+(on.length?'<b>По Україні — '+on.length+':</b> '+esc(names.join(", ")):'По Україні тривог немає')+'</div>';
+  var w=WX ? '<div class="now"><b>'+WX.t+'°</b>'+wicon(WX.c)+' '+esc(wcode(WX.c))+'</div><div class="sub" style="font-size:12px;color:rgba(255,255,255,.6);margin-top:2px">Макс.: '+WX.mx+'° · Мін.: '+WX.mn+'°</div>' : '<div class="now">завантаження…</div>';
+  var hrs=HOURLY.slice(0,6).map(function(x,i){ return '<div>'+(i?pad(x.h):"Зараз")+'<i>'+wicon(x.c)+'</i><b>'+Math.round(x.t)+'°</b></div>'; }).join("");
+  $("ncW").innerHTML='<div class="lbl">Погода · '+esc(CONFIG.city)+'</div>'+w+(hrs?'<div class="hrs">'+hrs+'</div>':'');
+  $("ncL").innerHTML='<div class="lbl">Журнал подій</div>'+(logAll.length?logAll.slice(0,5).map(function(l){return"<p>"+l+"</p>"}).join(""):'<p style="color:rgba(255,255,255,.5)">поки що без змін</p>');
+  var isHome=HAS_BRIDGE&&Android.isDefaultHome&&Android.isDefaultHome();
+  $("ncS").innerHTML='<div class="lbl">Система</div>'+
+    '<p>Джерело: <b>'+esc(lastSrc||"—")+'</b></p>'+
+    '<p>Оновлено: <b>'+(lastOk?pad(new Date(lastOk).getHours())+":"+pad(new Date(lastOk).getMinutes()):"—")+'</b> · кожні 30 с</p>'+
+    '<p>Звук тривоги: <b>'+(state.sound?"увімкнено":"вимкнено")+'</b></p>'+
+    '<p>Головний екран: <b>'+(HAS_BRIDGE?(isHome?"✓ Вітальня":"не встановлено"):"—")+'</b></p>';
+  $("nbSound").textContent=state.sound?"🔔 Звук: увімк.":"🔕 Звук: вимк.";
+  $("nbMap").style.display = (HAS_BRIDGE&&state.mapMode==="ual") ? "" : "none";
+}
+function addLog(html){ logAll.unshift(html); logAll=logAll.slice(0,10); logLines.unshift(html); logLines=logLines.slice(0,4); if(NS.open) renderNotch(); $("log").innerHTML=logLines.map(function(l){return"<p>"+l+"</p>"}).join(""); }
 fetchAlerts(); setInterval(fetchAlerts, 30000); setInterval(function(){ if(alerts) render(); },60000);
 
 /* ---------- сповіщення ---------- */
@@ -500,11 +568,11 @@ function beep(){ if(!state.sound) return; try{ actx=actx||new (window.AudioConte
     g.gain.setValueAtTime(0.12,actx.currentTime+i*0.7); g.gain.setValueAtTime(0,actx.currentTime+i*0.7+0.62);
     o.connect(g); g.connect(actx.destination); o.start(actx.currentTime+i*0.7); o.stop(actx.currentTime+i*0.7+0.65); } }catch(e){} }
 var alarmTimer;
-function showAlarm(){ $("alarmWhere").textContent=nameOf(state.home); $("alarm").className="show"; mapFull=false; syncMap(); beep();
+function showAlarm(){ if(NS.open){ NS.open=false; paintNotch(); } $("alarmWhere").textContent=nameOf(state.home); $("alarm").className="show"; mapFull=false; syncMap(); beep();
   clearTimeout(alarmTimer); alarmTimer=setTimeout(hideAlarm,30000); }
 function hideAlarm(){ $("alarm").className=""; syncMap(); }
-function toast(t){ var n=$("notch"); $("notchTxt").textContent=t; n.className="wide"; notchBusy=true;
-  clearTimeout(notchTimer); notchTimer=setTimeout(function(){ notchBusy=false; n.className=""; if(alerts) render(); },5000); }
+function toast(t){ NS.toast=t; paintNotch();
+  clearTimeout(notchTimer); notchTimer=setTimeout(function(){ NS.toast=""; paintNotch(); },5000); }
 
 /* ---------- «думки» ---------- */
 var PHR=["Шукаю сонце…","Слухаю небо…","Рахую хмари…","Гріюсь біля роутера…","Заварюю чай…","Вигадую, що подивитись…","Протираю пульт…","Чекаю на відбій…"];
@@ -569,9 +637,9 @@ function renderRegs(){ var c=$("regs"); c.innerHTML=""; var ids=["kyiv_city"].co
   $("bAuto").textContent="⏻ Автозапуск при ввімкненні: "+(auto?"✓ увімк.":"дозволити"); }
 
 /* ---------- фокус і пульт ---------- */
-var focused=null;
-function layer(){ if(isOpen("ovApps")) return $("ovApps"); if(isOpen("ovSet")) return $("ovSet"); return $("stage"); }
-function setFocus(el){ if(!el) return; if(focused) focused.classList.remove("on"); focused=el; el.classList.add("on"); scrollInto(el); }
+function layer(){ if(NS.open) return $("npanel"); if(isOpen("ovApps")) return $("ovApps"); if(isOpen("ovSet")) return $("ovSet"); return $("stage"); }
+function setFocus(el){ if(!el) return; var prev=focused; if(focused) focused.classList.remove("on"); focused=el; el.classList.add("on"); scrollInto(el);
+  if((prev===$("notch")||el===$("notch"))&&prev!==el) paintNotch(); }
 function scrollInto(el){
   if($("dockin").contains(el)){ var dw=$("dockclip").clientWidth-8, x=el.offsetLeft, w=el.offsetWidth, c=$("dockin");
     var cur=-(parseFloat((c.style.transform||"").replace(/[^-\d.]/g,""))||0); if(x<cur) cur=x; if(x+w>cur+dw) cur=x+w-dw; c.style.transform="translateX("+(-cur)+"px)"; }
@@ -597,6 +665,11 @@ function activate(el){ if(!el) return; var pkg=el.getAttribute("data-pkg"), act=
     else launch(pkg); return; }
   if(reg){ state.home=reg; save("home",reg); renderRegs(); setFocus($("regs").querySelector("[data-reg='"+reg+"']")); render(); return; }
   if(act==="mapfull"){ if(state.mapMode==="ual"&&HAS_BRIDGE){ mapFull=true; syncMap(); toast("Назад — повернутись"); } return; }
+  if(act==="notch"){ openNotch(); return; }
+  if(act==="nclose"){ closeNotch(); return; }
+  if(act==="nsound"){ state.sound=!state.sound; save("sound",state.sound); renderNotch(); return; }
+  if(act==="nmap"){ NS.open=false; paintNotch(); mapFull=true; syncMap(); toast("Назад — повернутись"); return; }
+  if(act==="settings"&&NS.open){ NS.open=false; paintNotch(); }
   if(act==="mapmode"){ state.mapMode=state.mapMode==="ual"?"own":"ual"; save("mapMode2",state.mapMode); renderRegs(); return; }
   if(act==="apps") openOv("ovApps");
   if(act==="settings") openOv("ovSet");
@@ -609,7 +682,7 @@ function activate(el){ if(!el) return; var pkg=el.getAttribute("data-pkg"), act=
   if(act==="homeset"&&HAS_BRIDGE) Android.openHomeSettings();
   if(act==="autostart"&&HAS_BRIDGE){ if(Android.canAutostart()) toast("✓ Автозапуск уже увімкнено"); else { toast("Увімкни дозвіл для «Вітальня» і натисни «Назад»"); Android.openAutostartSettings(); } }
 }
-window.onTvBack=function(){ if(mapFull){ mapFull=false; syncMap(); return; } if($("alarm").className==="show"){ hideAlarm(); return; } if(!closeOv()) setFocus($("dockin").firstChild); };
+window.onTvBack=function(){ if(NS.open){ closeNotch(); return; } if(mapFull){ mapFull=false; syncMap(); return; } if($("alarm").className==="show"){ hideAlarm(); return; } if(!closeOv()) setFocus($("dockin").firstChild); };
 window.onTvResume=function(){ refreshApps(); fetchAlerts(); if(isOpen("ovSet")) renderRegs(); syncMap(); };
 document.addEventListener("keydown",function(e){
   if(actx&&actx.resume) actx.resume();
