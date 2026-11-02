@@ -99,7 +99,29 @@ body.lite .glass{background:rgba(18,36,140,.55)}
 #calG span.we{color:var(--dim)}
 #calG span.td{color:#fff;background:var(--red);border-radius:50%}
 
-#term{left:28px;top:240px;width:684px;height:226px;padding:18px 24px}
+#term{display:none}
+#wPower{left:28px;top:240px;width:684px;height:226px;padding:16px 24px}
+#wPower .lbl svg{width:13px;height:13px;vertical-align:-2px;margin-right:6px;fill:#ffd60a}
+#pwSrc{position:absolute;right:24px;top:16px;font-size:11px;color:var(--faint)}
+#pwNow{font-size:24px;font-weight:700;margin-top:8px;letter-spacing:-.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#pwNow small{font-size:15px;font-weight:500;color:var(--dim);margin-left:8px}
+#pwNow.off{color:#ffb340}
+#pwNote{font-size:12px;color:#ffd60a;height:16px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pday{margin-top:6px}
+.pday .pl{font-size:12px;font-weight:600;color:var(--dim);margin-bottom:4px}
+.pday .pl span{font-weight:500;color:rgba(255,255,255,.85);margin-left:8px}
+.pbar{position:relative;height:20px;border-radius:10px;background:rgba(48,209,88,.72);overflow:hidden;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.18)}
+.pbar .o{position:absolute;top:0;bottom:0;background:rgba(10,10,30,.78)}
+.pbar .q{position:absolute;top:0;bottom:0;background:repeating-linear-gradient(135deg,rgba(255,214,10,.75) 0 5px,rgba(10,10,30,.55) 5px 10px)}
+.pbar .nw{position:absolute;top:-2px;bottom:-2px;width:3px;margin-left:-1.5px;background:#fff;border-radius:2px;box-shadow:0 0 6px rgba(255,255,255,.9)}
+.pbar.na{background:rgba(255,255,255,.12)}
+.pbar .msg{position:absolute;left:0;right:0;top:0;line-height:20px;text-align:center;font-size:12px;color:rgba(255,255,255,.8)}
+.pticks{position:relative;height:14px;font-size:10px;color:var(--faint)}
+.pticks i{position:absolute;font-style:normal;-webkit-transform:translateX(-50%);transform:translateX(-50%);top:2px}
+#pgroups{display:grid;grid-template-columns:repeat(12,88px);grid-gap:8px;margin-top:6px}
+#pgroups .btn{margin:0;text-align:center;font-size:13px;padding:8px 4px}
+#regs .btn{padding:8px 6px}
 #term .lbl svg{width:13px;height:13px;vertical-align:-2px;margin-right:6px;fill:var(--dim)}
 #status{font-size:26px;font-weight:600;margin-top:10px;letter-spacing:-.2px}
 #status.alert{color:#ff8a82}
@@ -259,7 +281,16 @@ body.lite .ov{background:rgba(6,16,80,.94)}
 
   <div id="wCal" class="glass"><div id="calM"></div><div id="calG"></div></div>
 
-  <div id="term" class="glass">
+  <div id="wPower" class="glass fc" data-act="power">
+    <div class="lbl"><svg viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg>Графік відключень<span id="pwGrp"></span></div>
+    <div id="pwSrc"></div>
+    <div id="pwNow">завантаження…</div>
+    <div id="pwNote"></div>
+    <div class="pday"><div class="pl">Сьогодні<span id="pwTodayTxt"></span></div><div class="pbar" id="pwToday"></div>
+      <div class="pticks"><i style="left:0;transform:none">00</i><i style="left:12.5%">03</i><i style="left:25%">06</i><i style="left:37.5%">09</i><i style="left:50%">12</i><i style="left:62.5%">15</i><i style="left:75%">18</i><i style="left:87.5%">21</i><i style="right:0;left:auto;transform:none">24</i></div></div>
+    <div class="pday"><div class="pl">Завтра<span id="pwTomTxt"></span></div><div class="pbar" id="pwTom"></div></div>
+  </div>
+  <div id="term">
     <div class="lbl"><svg viewBox="0 0 24 24"><path d="M12 2 1 21h22L12 2zm1 15h-2v-2h2v2zm0-4h-2V9h2v4z"/></svg>Повітряна тривога</div>
     <div id="status"><span class="dot a"></span>перевіряю тривоги…</div>
     <div id="log"></div>
@@ -276,7 +307,7 @@ body.lite .ov{background:rgba(6,16,80,.94)}
   <div id="dock">
     <div id="dockwrap"><div id="dockclip"><div id="dockin"></div></div></div><div id="dsep"></div><div class="app sys fc" id="bApps" data-act="apps"><div class="ico tr"><svg viewBox="0 0 70 70"><defs><linearGradient id="lp" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff7a59"/><stop offset=".5" stop-color="#c04dff"/><stop offset="1" stop-color="#2f6bff"/></linearGradient></defs><rect width="70" height="70" rx="15.75" fill="url(#lp)"/><g fill="#fff" opacity=".95"><rect x="15" y="15" width="10" height="10" rx="3"/><rect x="30" y="15" width="10" height="10" rx="3"/><rect x="45" y="15" width="10" height="10" rx="3"/><rect x="15" y="30" width="10" height="10" rx="3"/><rect x="30" y="30" width="10" height="10" rx="3"/><rect x="45" y="30" width="10" height="10" rx="3"/><rect x="15" y="45" width="10" height="10" rx="3"/><rect x="30" y="45" width="10" height="10" rx="3"/><rect x="45" y="45" width="10" height="10" rx="3"/></g></svg></div><div class="lb">Усі програми</div><div class="run"></div></div><div class="app sys fc" id="bSet" data-act="settings"><div class="ico tr"><svg viewBox="0 0 70 70"><defs><linearGradient id="gs" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e6e8ee"/><stop offset="1" stop-color="#8e939f"/></linearGradient></defs><rect width="70" height="70" rx="15.75" fill="url(#gs)"/><circle cx="35" cy="35" r="21" fill="#4a4f5a"/><g fill="#d8dbe2"><path d="M35 17l3 6h-6zM35 53l-3-6h6zM17 35l6-3v6zM53 35l-6 3v-6zM22.3 22.3l6.4 2.1-4.2 4.2zM47.7 47.7l-6.4-2.1 4.2-4.2zM47.7 22.3l-2.1 6.4-4.2-4.2zM22.3 47.7l2.1-6.4 4.2 4.2z"/></g><circle cx="35" cy="35" r="12" fill="#d8dbe2"/><circle cx="35" cy="35" r="6" fill="#4a4f5a"/></svg></div><div class="lb">Налаштування</div><div class="run"></div></div>
   </div>
-  <div id="hint"><b>← →</b>вибір · <b>OK</b>відкрити · <b>↑</b>мапа · <b>↑↑</b>шторка · <b>Назад</b>до доку</div>
+  <div id="hint"><b>← →</b>вибір · <b>OK</b>відкрити · <b>↑</b>віджети · <b>↑↑</b>шторка · <b>Назад</b>до доку</div>
 
   <div id="ovApps" class="ov">
     <h2>Усі програми</h2>
@@ -301,6 +332,8 @@ body.lite .ov{background:rgba(6,16,80,.94)}
       <span class="btn fc" data-act="homeset">Налаштування головного екрана</span>
       <span class="btn fc" data-act="autostart" id="bAuto">⏻ Автозапуск при ввімкненні</span>
     </div>
+    <div class="sec lbl">Моя черга відключень світла (YASNO · Київ)</div>
+    <div id="pgroups"></div>
     <div class="sec lbl">Мій регіон — для статусу й сповіщень</div>
     <div id="regs"></div>
   </div>
@@ -316,6 +349,8 @@ var CONFIG = {
   lat: 50.4501, lon: 30.5234, // координати для погоди
   homeRegion: "kyiv_city",    // див. REGIONS нижче
   alertsToken: "",            // необов'язково: токен alerts.in.ua (точніші дані)
+  powerGroup: "",             // черга відключень, напр. "3.1" (можна обрати в ⚙ Налаштуваннях)
+  powerRegion: 25, powerDso: 902,  // YASNO: 25/902 — Київ (ДТЕК Київські електромережі)
   defaultPins: ["lampa","youtube|smarttube","megogo","kyivstar|київстар","sweet","uakino","netflix","prime|amazon"]
 };
 /* ================================================= */
@@ -345,7 +380,7 @@ var DEMO = /demo/.test(location.search);
 /* ---------- сховище ---------- */
 function load(k,d){ try{ var v = HAS_BRIDGE ? Android.load(k) : localStorage.getItem(k); return v ? JSON.parse(v) : d; }catch(e){ return d; } }
 function save(k,v){ try{ var s=JSON.stringify(v); if(HAS_BRIDGE) Android.save(k,s); else localStorage.setItem(k,s); }catch(e){} }
-var state = { home: load("home", CONFIG.homeRegion), sound: load("sound", true), pins: load("pins", null), mapMode: load("mapMode2", "own"), lite: load("lite", false) };
+var state = { home: load("home", CONFIG.homeRegion), sound: load("sound", true), pins: load("pins", null), mapMode: load("mapMode2", "own"), lite: load("lite", false), pgroup: load("pgroup", "") };
 if(state.lite) document.body.className="lite";
 
 /* ---------- масштаб під екран ---------- */
@@ -552,13 +587,85 @@ function renderNotch(){
   $("ncS").innerHTML='<div class="lbl">Система</div>'+
     '<p>Джерело: <b>'+esc(lastSrc||"—")+'</b></p>'+
     '<p>Оновлено: <b>'+(lastOk?pad(new Date(lastOk).getHours())+":"+pad(new Date(lastOk).getMinutes()):"—")+'</b> · кожні 30 с</p>'+
+    '<p>Світло'+(pgroup()?' ('+esc(pgroup())+')':'')+': <b>'+esc(POWER_NOW||"—")+'</b></p>'+
     '<p>Звук тривоги: <b>'+(state.sound?"увімкнено":"вимкнено")+'</b></p>'+
-    '<p>Головний екран: <b>'+(HAS_BRIDGE?(isHome?"✓ Вітальня":"не встановлено"):"—")+'</b></p>';
+    '';
   $("nbSound").textContent=state.sound?"🔔 Звук: увімк.":"🔕 Звук: вимк.";
   $("nbMap").style.display = (HAS_BRIDGE&&state.mapMode==="ual") ? "" : "none";
 }
 function addLog(html){ logAll.unshift(html); logAll=logAll.slice(0,10); logLines.unshift(html); logLines=logLines.slice(0,4); if(NS.open) renderNotch(); $("log").innerHTML=logLines.map(function(l){return"<p>"+l+"</p>"}).join(""); }
 fetchAlerts(); setInterval(fetchAlerts, 30000); setInterval(function(){ if(alerts) render(); },60000);
+
+/* ---------- графік відключень (YASNO) ---------- */
+var PW={data:null, ok:0, err:"", groups:[]};
+function pgroup(){ return state.pgroup||CONFIG.powerGroup||""; }
+function hm(m){ m=Math.max(0,Math.min(1440,m)); return pad(Math.floor(m/60)%24===0&&m===1440?24:Math.floor(m/60))+":"+pad(m%60); }
+function dur(m){ var h=Math.floor(m/60), mm=m%60; return (h?h+" год ":"")+(mm||!h?mm+" хв":"").trim(); }
+function demoPower(){ var mk=function(sl){ return {slots:sl,status:"ScheduleApplies"}; }, o={};
+  ["1.1","1.2","2.1","2.2","3.1","3.2","4.1","4.2","5.1","5.2","6.1","6.2"].forEach(function(g,i){ var b=(i*90)%480;
+    o[g]={today:mk([{start:b+60,end:b+300,type:"Definite"},{start:b+720,end:b+960,type:"Definite"},{start:b+1140,end:Math.min(1440,b+1260),type:"Possible"}]),
+          tomorrow:mk([{start:b+180,end:b+420,type:"Definite"},{start:b+900,end:b+1140,type:"Definite"}])}; });
+  return o; }
+function fetchPower(){
+  if(DEMO){ PW.data=demoPower(); PW.ok=Date.now(); PW.groups=Object.keys(PW.data); renderPower(); return; }
+  var u="https://app.yasno.ua/api/blackout-service/public/shutdowns/regions/"+CONFIG.powerRegion+"/dsos/"+CONFIG.powerDso+"/planned-outages";
+  httpGet(u).then(function(r){
+    try{ if(r.status!==200) throw new Error(r.status?"HTTP "+r.status:"немає зʼєднання");
+      var j=JSON.parse(r.body); if(!j||typeof j!=="object") throw new Error("формат");
+      var keys=Object.keys(j).filter(function(k){ return /^\d+(\.\d+)?$/.test(k); });
+      if(!keys.length) throw new Error("порожня відповідь");
+      keys.sort(function(a,b){ return parseFloat(a)-parseFloat(b)||a.localeCompare(b); });
+      PW.data=j; PW.groups=keys; PW.ok=Date.now(); PW.err="";
+    }catch(e){ PW.err=e.message||"помилка"; }
+    renderPower(); if(isOpen("ovSet")) renderRegs();
+  });
+}
+function daySlots(day,kind){ if(!day||!(day.slots instanceof Array)) return [];
+  return day.slots.filter(function(s){ return s&&s.type===kind&&s.end>s.start; })
+    .map(function(s){ return {start:+s.start,end:+s.end}; }).sort(function(a,b){ return a.start-b.start; }); }
+function merge(sl){ var o=[]; sl.forEach(function(s){ var l=o[o.length-1]; if(l&&s.start<=l.end) l.end=Math.max(l.end,s.end); else o.push({start:s.start,end:s.end}); }); return o; }
+function barHtml(day){
+  if(!day) return {cls:"pbar na",html:'<div class="msg">графік ще не опубліковано</div>',txt:""};
+  if(day.status==="EmergencyShutdowns") return {cls:"pbar na",html:'<div class="msg">⚠ екстрені відключення — графік не діє</div>',txt:""};
+  var off=merge(daySlots(day,"Definite")), pos=merge(daySlots(day,"Possible")), h="";
+  pos.forEach(function(s){ h+='<div class="q" style="left:'+(s.start/14.4)+'%;width:'+((s.end-s.start)/14.4)+'%"></div>'; });
+  off.forEach(function(s){ h+='<div class="o" style="left:'+(s.start/14.4)+'%;width:'+((s.end-s.start)/14.4)+'%"></div>'; });
+  var txt=off.length?off.map(function(s){ return hm(s.start)+"–"+hm(s.end); }).join(", "):(pos.length?"лише можливі відключення":"без відключень");
+  if(!off.length&&!pos.length&&!(day.slots&&day.slots.length)&&day.status!=="ScheduleApplies"&&day.status) txt="без відключень";
+  return {cls:"pbar",html:h,txt:txt}; }
+var POWER_NOW="";
+function renderPower(){
+  var g=pgroup(), el=$("pwNow");
+  $("pwGrp").textContent=g?" · черга "+g:"";
+  $("pwSrc").textContent=PW.ok?"YASNO · "+pad(new Date(PW.ok).getHours())+":"+pad(new Date(PW.ok).getMinutes()):(PW.err?"YASNO · "+PW.err:"");
+  var td=$("pwToday"), tm=$("pwTom");
+  if(!g){ el.className=""; el.innerHTML='Обери свою чергу <small>OK → налаштування</small>'; $("pwNote").textContent="Черга є в додатку YASNO або на сайті ДТЕК за адресою";
+    td.className="pbar na"; td.innerHTML=""; tm.className="pbar na"; tm.innerHTML=""; $("pwTodayTxt").textContent=""; $("pwTomTxt").textContent=""; POWER_NOW=""; return; }
+  var G=PW.data&&PW.data[g];
+  if(!G){ el.className=""; el.innerHTML=PW.data?'Черги '+esc(g)+' немає в графіку':(PW.err?'Немає даних <small>'+esc(PW.err)+'</small>':'Завантажую графік…');
+    $("pwNote").textContent=PW.data?"Обери іншу чергу в налаштуваннях":""; td.className="pbar na"; td.innerHTML=""; tm.className="pbar na"; tm.innerHTML="";
+    $("pwTodayTxt").textContent=""; $("pwTomTxt").textContent=""; POWER_NOW=""; return; }
+  var a=barHtml(G.today), b=barHtml(G.tomorrow);
+  var d=new Date(), now=d.getHours()*60+d.getMinutes();
+  td.className=a.cls; td.innerHTML=a.html+'<div class="nw" style="left:'+(now/14.4)+'%"></div>'; $("pwTodayTxt").textContent=a.txt;
+  tm.className=b.cls; tm.innerHTML=b.html; $("pwTomTxt").textContent=b.txt;
+  var note="";
+  if(G.today&&G.today.status==="EmergencyShutdowns"){ el.className="off"; el.innerHTML="⚠ Екстрені відключення"; POWER_NOW="екстрені відключення"; $("pwNote").textContent="Графік зараз не діє — світло можуть вимкнути будь-коли"; return; }
+  if(G.today&&G.today.status==="WaitingForSchedule") note="Графік ще може змінитися";
+  // поточний стан і наступна зміна (сьогодні + завтра як одна лінія)
+  var offT=merge(daySlots(G.today,"Definite")), offM=(G.tomorrow&&G.tomorrow.status!=="EmergencyShutdowns")?merge(daySlots(G.tomorrow,"Definite")):[];
+  var line=merge(offT.concat(offM.map(function(s){ return {start:s.start+1440,end:s.end+1440}; })));
+  var cur=null, next=null;
+  for(var i=0;i<line.length;i++){ if(line[i].start<=now&&now<line[i].end){ cur=line[i]; break; } if(line[i].start>now){ next=line[i]; break; } }
+  function at(m){ return (m>=1440?"завтра о ":"о ")+hm(m%1440===0&&m>0?1440:m%1440); }
+  if(cur){ el.className="off"; el.innerHTML='● Світла немає · увімкнуть '+at(cur.end)+'<small>через '+dur(cur.end-now)+'</small>'; POWER_NOW="немає до "+hm(cur.end%1440||1440); }
+  else if(next){ el.className=""; el.innerHTML='<span style="color:var(--green)">●</span> Світло є · вимкнуть '+at(next.start)+'<small>через '+dur(next.start-now)+'</small>'; POWER_NOW="є, вимкнуть "+at(next.start); }
+  else { el.className=""; el.innerHTML='<span style="color:var(--green)">●</span> Світло є<small>відключень не заплановано</small>'; POWER_NOW="є, без відключень"; }
+  var pos=merge(daySlots(G.today,"Possible")).filter(function(s){ return s.end>now; });
+  if(!note&&pos.length) note="Можливе відключення "+hm(pos[0].start)+"–"+hm(pos[0].end);
+  $("pwNote").textContent=note;
+}
+fetchPower(); setInterval(fetchPower, 10*60*1000); setInterval(renderPower, 30000);
 
 /* ---------- сповіщення ---------- */
 var actx=null;
@@ -627,7 +734,10 @@ function isOpen(id){ return $(id).className.indexOf("show")>=0; }
 function openOv(id){ $(id).className="ov show"; mapFull=false; syncMap(); if(id==="ovApps"){ renderAll(); setFocus($("allin").firstChild||$("bEdit")); } else { renderRegs(); setFocus($("bSound")); } }
 function closeOv(){ var any=false; ["ovApps","ovSet"].forEach(function(id){ if(isOpen(id)){ $(id).className="ov"; any=true; } });
   editMode=false; $("bEdit").textContent="✎ Редагувати док: вимк."; renderDock(); setFocus($("dockin").firstChild); syncMap(); return any; }
-function renderRegs(){ var c=$("regs"); c.innerHTML=""; var ids=["kyiv_city"].concat(REGIONS.map(function(r){return r[0]}));
+function renderGroups(){ var c=$("pgroups"); c.innerHTML="";
+  var gs=PW.groups.length?PW.groups:["1.1","1.2","2.1","2.2","3.1","3.2","4.1","4.2","5.1","5.2","6.1","6.2"];
+  gs.forEach(function(g){ var b=document.createElement("span"); b.className="btn fc"+(pgroup()===g?" sel":""); b.setAttribute("data-pg",g); b.textContent=g; c.appendChild(b); }); }
+function renderRegs(){ renderGroups(); var c=$("regs"); c.innerHTML=""; var ids=["kyiv_city"].concat(REGIONS.map(function(r){return r[0]}));
   ids.forEach(function(id){ var b=document.createElement("span"); b.className="btn fc"+(state.home===id?" sel":""); b.setAttribute("data-reg",id); b.textContent=nameOf(id); c.appendChild(b); });
   $("bSound").textContent="🔔 Звук тривоги: "+(state.sound?"увімк.":"вимк.");
   $("bGlass").textContent="✨ Скло: "+(state.lite?"просте (швидше)":"розмите");
@@ -663,6 +773,8 @@ function activate(el){ if(!el) return; var pkg=el.getAttribute("data-pkg"), act=
   if(pkg){ if(isOpen("ovApps")&&editMode){ var i=state.pins.indexOf(pkg); if(i>=0) state.pins.splice(i,1); else state.pins.push(pkg); save("pins",state.pins);
       var idx=Array.prototype.indexOf.call($("allin").children,el); renderAll(); setFocus($("allin").children[idx]); }
     else launch(pkg); return; }
+  var pg=el.getAttribute("data-pg");
+  if(pg){ state.pgroup=pg; save("pgroup",pg); renderGroups(); setFocus($("pgroups").querySelector("[data-pg='"+pg+"']")); renderPower(); toast("⚡ Черга "+pg); return; }
   if(reg){ state.home=reg; save("home",reg); renderRegs(); setFocus($("regs").querySelector("[data-reg='"+reg+"']")); render(); return; }
   if(act==="mapfull"){ if(state.mapMode==="ual"&&HAS_BRIDGE){ mapFull=true; syncMap(); toast("Назад — повернутись"); } return; }
   if(act==="notch"){ openNotch(); return; }
@@ -670,13 +782,14 @@ function activate(el){ if(!el) return; var pkg=el.getAttribute("data-pkg"), act=
   if(act==="nsound"){ state.sound=!state.sound; save("sound",state.sound); renderNotch(); return; }
   if(act==="nmap"){ NS.open=false; paintNotch(); mapFull=true; syncMap(); toast("Назад — повернутись"); return; }
   if(act==="settings"&&NS.open){ NS.open=false; paintNotch(); }
+  if(act==="power"){ openOv("ovSet"); var sb=$("pgroups").querySelector(".sel")||$("pgroups").firstChild; if(sb) setFocus(sb); return; }
   if(act==="mapmode"){ state.mapMode=state.mapMode==="ual"?"own":"ual"; save("mapMode2",state.mapMode); renderRegs(); return; }
   if(act==="apps") openOv("ovApps");
   if(act==="settings") openOv("ovSet");
   if(act==="edit"){ editMode=!editMode; el.textContent="✎ Редагувати док: "+(editMode?"увімк. (OK — ★ закріпити/зняти)":"вимк."); }
   if(act==="glass"){ state.lite=!state.lite; save("lite",state.lite); document.body.className=state.lite?"lite":""; renderRegs(); }
   if(act==="sound"){ state.sound=!state.sound; save("sound",state.sound); renderRegs(); }
-  if(act==="reload"){ fetchAlerts(); loadWeather(); refreshApps(); toast("⟳ Оновлено"); }
+  if(act==="reload"){ fetchAlerts(); loadWeather(); fetchPower(); refreshApps(); toast("⟳ Оновлено"); }
   if(act==="android"&&HAS_BRIDGE) Android.openSettings();
   if(act==="home"&&HAS_BRIDGE){ toast("Обери «Вітальня» → «Завжди»"); Android.chooseHome(); }
   if(act==="homeset"&&HAS_BRIDGE) Android.openHomeSettings();
