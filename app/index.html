@@ -120,20 +120,25 @@ body.lite #dock{background:rgba(18,36,140,.6)}
 #dockin{position:relative;transition:transform .2s;white-space:nowrap}
 .app{display:inline-block;vertical-align:top;width:70px;height:70px;margin:0 5px;border-radius:17px;position:relative;
   -webkit-transition:-webkit-transform .16s;transition:transform .16s}
-.app .ico{width:70px;height:70px;border-radius:17px;overflow:hidden;background:#2b3240;box-shadow:0 3px 8px rgba(0,0,0,.25)}
-.app .ico img{width:100%;height:100%;object-fit:cover;display:block}
-.app .ico img.ic{object-fit:contain;padding:6px;background:#fff}
-.app .ico.tr{background:transparent;box-shadow:none} .app .ico.tr img.ic{padding:0;background:transparent}
-.app .ico.ph{font-size:30px;font-weight:700;line-height:70px;text-align:center;color:#fff}
+.ios{position:relative;overflow:hidden;border-radius:22.5%;background:#fff;
+  box-shadow:0 4px 10px rgba(0,10,60,.28),0 1px 2px rgba(0,0,0,.2)}
+.ios img{width:100%;height:100%;object-fit:cover;display:block}
+.ios:after{content:"";position:absolute;left:0;top:0;right:0;bottom:0;border-radius:inherit;
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.08),inset 0 1px 0 rgba(255,255,255,.25)}
+.ios.ph{color:#fff;font-weight:700;text-align:center;text-shadow:0 1px 2px rgba(0,0,0,.18)}
+.app .ico{width:70px;height:70px}
+.app .ico.ph{font-size:32px;line-height:70px}
+.app .ico.ban img{object-fit:cover;-webkit-transform:scale(1.25);transform:scale(1.25)}
 .app .lb{position:absolute;left:50%;bottom:86px;-webkit-transform:translateX(-50%);transform:translateX(-50%);padding:4px 11px;border-radius:9px;
   background:rgba(30,30,40,.82);font-size:13px;font-weight:500;white-space:nowrap;display:none}
 .app .run{position:absolute;left:50%;bottom:-8px;width:5px;height:5px;margin-left:-2.5px;border-radius:50%;background:rgba(255,255,255,.85);display:none}
 .app.on{-webkit-transform:translateY(-10px) scale(1.2);transform:translateY(-10px) scale(1.2);z-index:3}
 .app.on .lb{display:block;-webkit-transform:translateX(-50%) scale(.84);transform:translateX(-50%) scale(.84)}
 .app.on .run{display:block}
-.app.on .ico{box-shadow:0 0 0 2.5px #fff,0 8px 18px rgba(0,0,0,.4)}
+.app.on .ico{box-shadow:0 0 0 2.5px #fff,0 10px 22px rgba(0,10,60,.45)}
 #dsep{display:inline-block;vertical-align:top;width:1px;height:58px;margin:6px 10px 0;background:rgba(255,255,255,.35)}
-.sys .ico{display:block}
+.sys .ico{display:block;background:transparent}
+.sys .ico:after{display:none}
 .sys svg{width:70px;height:70px;display:block}
 #hint{position:absolute;left:0;right:0;bottom:12px;text-align:center;font-size:12px;color:rgba(255,255,255,.62)}
 #hint b{font-weight:600;color:#fff;margin:0 4px}
@@ -148,9 +153,9 @@ body.lite .ov{background:rgba(6,16,80,.94)}
 #allgrid{position:relative;height:486px;overflow:hidden;padding:14px;margin:0 -14px}
 #allin{display:grid;grid-template-columns:repeat(8,128px);grid-gap:12px 14px;transition:transform .2s;justify-content:center}
 .ga{height:132px;border-radius:20px;position:relative;text-align:center;padding-top:10px}
-.ga img{width:76px;height:76px;object-fit:contain;border-radius:18px}
-.ga div{font-size:13px;color:#fff;padding:7px 6px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 3px rgba(0,0,0,.4)}
-.ga .gph{display:inline-block;width:76px;height:76px;border-radius:18px;font-size:34px;font-weight:700;line-height:76px;color:#fff}
+.ga .ios{display:inline-block;width:76px;height:76px;vertical-align:top}
+.ga .nm{font-size:13px;color:#fff;padding:7px 6px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 3px rgba(0,0,0,.4)}
+.ga .ios.ph{font-size:34px;line-height:76px}
 .ga .star{position:absolute;right:16px;top:4px;color:#ffd60a;font-size:18px}
 .ga.on{background:rgba(255,255,255,.2);box-shadow:0 0 0 2.5px #fff}
 .btn{display:inline-block;padding:11px 20px;border-radius:14px;font-size:15px;margin:0 10px 12px 0;color:#fff;
@@ -234,7 +239,7 @@ body.lite .ov{background:rgba(6,16,80,.94)}
   </div>
 
   <div id="dock">
-    <div id="dockwrap"><div id="dockclip"><div id="dockin"></div></div></div><div id="dsep"></div><div class="app sys fc" id="bApps" data-act="apps"><div class="ico tr"><svg viewBox="0 0 70 70"><defs><linearGradient id="lp" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff7a59"/><stop offset=".5" stop-color="#c04dff"/><stop offset="1" stop-color="#2f6bff"/></linearGradient></defs><rect width="70" height="70" rx="17" fill="url(#lp)"/><g fill="#fff" opacity=".95"><rect x="15" y="15" width="10" height="10" rx="3"/><rect x="30" y="15" width="10" height="10" rx="3"/><rect x="45" y="15" width="10" height="10" rx="3"/><rect x="15" y="30" width="10" height="10" rx="3"/><rect x="30" y="30" width="10" height="10" rx="3"/><rect x="45" y="30" width="10" height="10" rx="3"/><rect x="15" y="45" width="10" height="10" rx="3"/><rect x="30" y="45" width="10" height="10" rx="3"/><rect x="45" y="45" width="10" height="10" rx="3"/></g></svg></div><div class="lb">Усі програми</div><div class="run"></div></div><div class="app sys fc" id="bSet" data-act="settings"><div class="ico tr"><svg viewBox="0 0 70 70"><defs><linearGradient id="gs" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e6e8ee"/><stop offset="1" stop-color="#8e939f"/></linearGradient></defs><rect width="70" height="70" rx="17" fill="url(#gs)"/><circle cx="35" cy="35" r="21" fill="#4a4f5a"/><g fill="#d8dbe2"><path d="M35 17l3 6h-6zM35 53l-3-6h6zM17 35l6-3v6zM53 35l-6 3v-6zM22.3 22.3l6.4 2.1-4.2 4.2zM47.7 47.7l-6.4-2.1 4.2-4.2zM47.7 22.3l-2.1 6.4-4.2-4.2zM22.3 47.7l2.1-6.4 4.2 4.2z"/></g><circle cx="35" cy="35" r="12" fill="#d8dbe2"/><circle cx="35" cy="35" r="6" fill="#4a4f5a"/></svg></div><div class="lb">Налаштування</div><div class="run"></div></div>
+    <div id="dockwrap"><div id="dockclip"><div id="dockin"></div></div></div><div id="dsep"></div><div class="app sys fc" id="bApps" data-act="apps"><div class="ico tr"><svg viewBox="0 0 70 70"><defs><linearGradient id="lp" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff7a59"/><stop offset=".5" stop-color="#c04dff"/><stop offset="1" stop-color="#2f6bff"/></linearGradient></defs><rect width="70" height="70" rx="15.75" fill="url(#lp)"/><g fill="#fff" opacity=".95"><rect x="15" y="15" width="10" height="10" rx="3"/><rect x="30" y="15" width="10" height="10" rx="3"/><rect x="45" y="15" width="10" height="10" rx="3"/><rect x="15" y="30" width="10" height="10" rx="3"/><rect x="30" y="30" width="10" height="10" rx="3"/><rect x="45" y="30" width="10" height="10" rx="3"/><rect x="15" y="45" width="10" height="10" rx="3"/><rect x="30" y="45" width="10" height="10" rx="3"/><rect x="45" y="45" width="10" height="10" rx="3"/></g></svg></div><div class="lb">Усі програми</div><div class="run"></div></div><div class="app sys fc" id="bSet" data-act="settings"><div class="ico tr"><svg viewBox="0 0 70 70"><defs><linearGradient id="gs" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e6e8ee"/><stop offset="1" stop-color="#8e939f"/></linearGradient></defs><rect width="70" height="70" rx="15.75" fill="url(#gs)"/><circle cx="35" cy="35" r="21" fill="#4a4f5a"/><g fill="#d8dbe2"><path d="M35 17l3 6h-6zM35 53l-3-6h6zM17 35l6-3v6zM53 35l-6 3v-6zM22.3 22.3l6.4 2.1-4.2 4.2zM47.7 47.7l-6.4-2.1 4.2-4.2zM47.7 22.3l-2.1 6.4-4.2-4.2zM22.3 47.7l2.1-6.4 4.2 4.2z"/></g><circle cx="35" cy="35" r="12" fill="#d8dbe2"/><circle cx="35" cy="35" r="6" fill="#4a4f5a"/></svg></div><div class="lb">Налаштування</div><div class="run"></div></div>
   </div>
   <div id="hint"><b>← →</b>вибір · <b>OK</b>відкрити · <b>↑</b>мапа · <b>Назад</b>до доку</div>
 
@@ -524,23 +529,26 @@ function appBy(pkg){ for(var i=0;i<APPS.length;i++) if(APPS[i].pkg===pkg) return
 var COLORS=["#e8875a","#d84a3a","#3b82f6","#22a06b","#a855f7","#e0b02f","#14b8a6","#ec4899"];
 function appTile(a,cls){ var d=document.createElement("div"); d.className=cls+" fc"; d.setAttribute("data-pkg",a.pkg);
   if(cls==="app"){
-    var ico;
-    if(a.icon) ico='<div class="ico tr"><img class="ic" src="'+a.icon+'"></div>';
-    else if(a.banner) ico='<div class="ico"><img src="'+a.banner+'"></div>';
-    else ico='<div class="ico ph" style="background:'+COLORS[Math.abs(hash(a.label))%COLORS.length]+'"></div>';
-    d.innerHTML=ico+'<div class="lb"></div><div class="run"></div>';
+    d.innerHTML=iosIco(a,"ico")+'<div class="lb"></div><div class="run"></div>';
     d.querySelector(".lb").textContent=a.label;
-    if(!a.icon&&!a.banner) d.querySelector(".ph").textContent=a.label.charAt(0).toUpperCase();
   } else {
-    d.innerHTML=(a.icon?'<img src="'+a.icon+'">':'<span class="gph" style="background:'+COLORS[Math.abs(hash(a.label))%COLORS.length]+'">'+a.label.charAt(0).toUpperCase()+'</span>')+'<div></div>'+(state.pins.indexOf(a.pkg)>=0?'<span class="star">★</span>':'');
-    d.querySelector("div").textContent=a.label;
+    d.innerHTML=iosIco(a,"")+'<div class="nm"></div>'+(state.pins.indexOf(a.pkg)>=0?'<span class="star">★</span>':'');
+    d.querySelector(".nm").textContent=a.label;
   }
   return d; }
+/* іконка «як на iPhone»: квадрат зі скругленням, малюнок на всю площу */
+var GRADS=[["#ff9a5a","#ff5e3a"],["#5ad8ff","#1d77ff"],["#7cf29c","#21b85a"],["#ffd66b","#ff9f0a"],["#d58cff","#8a3dff"],["#ff7eb3","#ff2d6f"],["#6ee7d8","#0fa5a0"],["#9aa8ff","#4c5cff"]];
+function iosIco(a,cls){ cls="ios "+cls;
+  if(a.sq) return '<div class="'+cls+'"><img src="'+a.sq+'"></div>';
+  if(a.icon) return '<div class="'+cls+'"><img src="'+a.icon+'"></div>';
+  if(a.banner) return '<div class="'+cls+' ban"><img src="'+a.banner+'"></div>';
+  var g=GRADS[Math.abs(hash(a.label))%GRADS.length];
+  return '<div class="'+cls+' ph" style="background:linear-gradient(180deg,'+g[0]+','+g[1]+')">'+String(a.label.charAt(0)).toUpperCase().replace(/[<&]/g,"")+'</div>'; }
 function hash(s){ var h=0; for(var i=0;i<s.length;i++) h=(h*31+s.charCodeAt(i))|0; return h; }
 function renderDock(){ var c=$("dockin"), keep=focused&&focused.getAttribute("data-pkg"); c.innerHTML="";
   state.pins.forEach(function(p){ var a=appBy(p); if(a) c.appendChild(appTile(a,"app")); });
   if(!c.children.length){ var e=document.createElement("div"); e.className="app fc"; e.setAttribute("data-act","apps");
-    e.innerHTML='<div class="ico ph" style="background:rgba(255,255,255,.2)">+</div><div class="lb">Додати програми</div><div class="run"></div>'; c.appendChild(e); }
+    e.innerHTML='<div class="ios ico ph" style="background:rgba(255,255,255,.25)">+</div><div class="lb">Додати програми</div><div class="run"></div>'; c.appendChild(e); }
   if(!focused||!document.body.contains(focused)) setFocus(c.querySelector("[data-pkg='"+keep+"']")||c.firstChild); }
 function renderAll(){ var c=$("allin"); c.innerHTML=""; APPS.forEach(function(a){ c.appendChild(appTile(a,"ga")); }); }
 function launch(pkg){ if(HAS_BRIDGE) Android.launch(pkg); else toast("Запуск: "+pkg); }

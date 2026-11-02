@@ -11,7 +11,13 @@ import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.drawable.AdaptiveIconDrawable;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.Paint;
+import android.graphics.Rect;
+import android.graphics.RectF;
+import android.content.res.Resources;
+import android.util.DisplayMetrics;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
@@ -208,6 +214,105 @@ public class MainActivity extends Activity {
         }
     }
 
+    /** Найчіткіша версія іконки (xxxhdpi), якщо програма її має. */
+    private Drawable hiResIcon(ResolveInfo ri, PackageManager pm) {
+        try {
+            int res = ri.activityInfo.getIconResource();
+            if (res == 0) res = ri.activityInfo.applicationInfo.icon;
+            if (res != 0) {
+                Resources r = pm.getResourcesForApplication(ri.activityInfo.applicationInfo);
+                Drawable d = Build.VERSION.SDK_INT >= 22
+                        ? r.getDrawableForDensity(res, DisplayMetrics.DENSITY_XXXHIGH, null)
+                        : r.getDrawableForDensity(res, DisplayMetrics.DENSITY_XXXHIGH);
+                if (d != null) return d;
+            }
+        } catch (Throwable ignored) { }
+        try { return ri.loadIcon(pm); } catch (Throwable t) { return null; }
+    }
+
+    /**
+     * Перетворює будь-яку іконку на квадрат «як на iPhone»: малюнок на всю площу,
+     * без прозорих полів. Скруглення робиться вже в CSS.
+     */
+    private static String iosIcon(Drawable d) {
+        if (d == null) return null;
+        final int S = 192;
+        try {
+            Bitmap out = Bitmap.createBitmap(S, S, Bitmap.Config.ARGB_8888);
+            Canvas c = new Canvas(out);
+            if (Build.VERSION.SDK_INT >= 26 && d instanceof AdaptiveIconDrawable) {
+                // адаптивна іконка: шари 108dp, видима частина — центральні 72dp → розтягуємо на весь квадрат
+                AdaptiveIconDrawable a = (AdaptiveIconDrawable) d;
+                int full = Math.round(S * 108f / 72f), off = (full - S) / 2;
+                Drawable bg = a.getBackground(), fg = a.getForeground();
+                if (bg != null) { bg.setBounds(-off, -off, S + off, S + off); bg.draw(c); } else c.drawColor(Color.WHITE);
+                if (fg != null) { fg.setBounds(-off, -off, S + off, S + off); fg.draw(c); }
+                return toUri(out);
+            }
+            // звичайна іконка: малюємо великою, обрізаємо прозорі поля
+            int W = 384;
+            Bitmap raw = Bitmap.createBitmap(W, W, Bitmap.Config.ARGB_8888);
+            Canvas rc = new Canvas(raw);
+            d.setBounds(0, 0, W, W);
+            d.draw(rc);
+            int minX = W, minY = W, maxX = -1, maxY = -1;
+            int[] px = new int[W * W];
+            raw.getPixels(px, 0, W, 0, 0, W, W);
+            for (int y = 0; y < W; y++) for (int x = 0; x < W; x++) {
+                if ((px[y * W + x] >>> 24) > 40) {
+                    if (x < minX) minX = x; if (x > maxX) maxX = x;
+                    if (y < minY) minY = y; if (y > maxY) maxY = y;
+                }
+            }
+            if (maxX < 0) return null;
+            int bw = maxX - minX + 1, bh = maxY - minY + 1, side = Math.max(bw, bh);
+            int cx = (minX + maxX) / 2, cy = (minY + maxY) / 2;
+            // скільки площі квадрата реально зафарбовано
+            long opaque = 0; long rs = 0, gs = 0, bs = 0, n = 0;
+            for (int y = minY; y <= maxY; y++) for (int x = minX; x <= maxX; x++) {
+                int p = px[y * W + x];
+                if ((p >>> 24) > 200) {
+                    opaque++;
+                    // колір краю фігури — для тла в кутах
+                    boolean edge = x - minX < bw * 0.12 || maxX - x < bw * 0.12 || y - minY < bh * 0.12 || maxY - y < bh * 0.12;
+                    if (edge) { rs += (p >> 16) & 255; gs += (p >> 8) & 255; bs += p & 255; n++; }
+                }
+            }
+            float fill = opaque / (float) ((long) side * side);
+            Paint pt = new Paint(Paint.FILTER_BITMAP_FLAG | Paint.ANTI_ALIAS_FLAG);
+            if (n > 0) c.drawColor(Color.rgb((int) (rs / n), (int) (gs / n), (int) (bs / n)));
+            if (fill > 0.9f) {
+                // квадратна іконка — на весь розмір (трохи наближаємо, щоб сховати власне скруглення)
+                float z = side * 0.04f;
+                c.drawBitmap(raw, new Rect(Math.round(cx - side / 2f + z), Math.round(cy - side / 2f + z),
+                        Math.round(cx + side / 2f - z), Math.round(cy + side / 2f - z)), new RectF(0, 0, S, S), pt);
+            } else if (fill > 0.62f && n > 0) {
+                // кругла / скруглена іконка — тло кольором її краю, фігура на весь квадрат + трохи наближення
+                c.drawColor(Color.rgb((int) (rs / n), (int) (gs / n), (int) (bs / n)));
+                float z = side * 0.06f;
+                c.drawBitmap(raw, new Rect(Math.round(cx - side / 2f + z), Math.round(cy - side / 2f + z),
+                        Math.round(cx + side / 2f - z), Math.round(cy + side / 2f - z)), new RectF(0, 0, S, S), pt);
+            } else {
+                // логотип на прозорому тлі — біла плитка, логотип по центру
+                c.drawColor(Color.WHITE);
+                float m = S * 0.16f;
+                float sc = (S - 2 * m) / side;
+                float dw = bw * sc, dh = bh * sc;
+                c.drawBitmap(raw, new Rect(minX, minY, maxX + 1, maxY + 1),
+                        new RectF((S - dw) / 2, (S - dh) / 2, (S + dw) / 2, (S + dh) / 2), pt);
+            }
+            return toUri(out);
+        } catch (Throwable t) {
+            return null;
+        }
+    }
+
+    private static String toUri(Bitmap bmp) {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        bmp.compress(Bitmap.CompressFormat.PNG, 100, out);
+        return "data:image/png;base64," + Base64.encodeToString(out.toByteArray(), Base64.NO_WRAP);
+    }
+
     private class Bridge {
 
         @JavascriptInterface
@@ -237,12 +342,15 @@ public class MainActivity extends Activity {
                                 if (b == null) b = ai.loadBanner(pm);
                                 banner = drawableToDataUri(b, 320, 180);
                             } catch (Throwable ignored) { }
-                            String icon = drawableToDataUri(ri.loadIcon(pm), 128, 128);
-                            imgs = new String[]{banner, icon};
+                            Drawable hi = hiResIcon(ri, pm);
+                            String icon = drawableToDataUri(hi != null ? hi : ri.loadIcon(pm), 128, 128);
+                            String sq = iosIcon(hi != null ? hi : ri.loadIcon(pm));
+                            imgs = new String[]{banner, icon, sq};
                             iconCache.put(pkg, imgs);
                         }
                         if (imgs[0] != null) o.put("banner", imgs[0]);
                         if (imgs[1] != null) o.put("icon", imgs[1]);
+                        if (imgs.length > 2 && imgs[2] != null) o.put("sq", imgs[2]);
                         arr.put(o);
                     } catch (Throwable ignored) { }
                 }
