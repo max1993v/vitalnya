@@ -64,7 +64,7 @@ public class MainActivity extends Activity {
         prefs = getSharedPreferences("vitalnya", Context.MODE_PRIVATE);
 
         web = new WebView(this);
-        web.setBackgroundColor(Color.parseColor("#0c0d10"));
+        web.setBackgroundColor(Color.parseColor("#0a1fd6"));
         web.setFocusable(true);
         web.setFocusableInTouchMode(true);
         WebSettings s = web.getSettings();

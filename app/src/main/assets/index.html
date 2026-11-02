@@ -6,166 +6,266 @@
 <title>Вітальня</title>
 <style>
 :root{
-  --bg:#1b1d22; --panel:#22252b; --line:#3a3e47; --text:#e9e6df; --dim:#8c8f97;
-  --accent:#e8875a; --green:#5fd47a; --amber:#d9a03c; --red:#e2554a; --focus:#ffffff;
+  --text:#fff; --dim:rgba(255,255,255,.66); --faint:rgba(255,255,255,.42);
+  --red:#ff453a; --orange:#ff9f0a; --green:#32d74b; --blue:#0a84ff;
+  --glass:rgba(255,255,255,.13); --glass-b:rgba(255,255,255,.30); --glass-hi:rgba(255,255,255,.42);
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{width:100%;height:100%;background:#0c0d10;overflow:hidden;color:var(--text);
-  font-family:"Droid Sans Mono","Roboto Mono",Menlo,Consolas,monospace;-webkit-font-smoothing:antialiased}
-#stage{position:absolute;left:0;top:0;width:1280px;height:720px;transform-origin:0 0;
-  background:radial-gradient(ellipse at 20% 0%,#2a2d34 0%,var(--bg) 55%,#15171b 100%);overflow:hidden}
-.box{border:1.5px solid var(--accent);border-radius:12px;background:rgba(255,255,255,.015)}
+html,body{width:100%;height:100%;background:#020a3a;overflow:hidden;color:var(--text);
+  font-family:"SF Pro Display","Inter",Roboto,"Helvetica Neue",Arial,sans-serif;-webkit-font-smoothing:antialiased}
+#stage{position:absolute;left:0;top:0;width:1280px;height:720px;transform-origin:0 0;overflow:hidden;background:#0a1fd6}
+#wall{position:absolute;left:0;top:0;width:1280px;height:720px}
 
-/* header */
-#hello{position:absolute;left:28px;top:24px;width:640px;padding:14px 20px}
-#hello b{font-size:21px;letter-spacing:.3px}
-#hello b i{color:var(--accent);font-style:normal;margin-right:10px}
-#hello div{color:var(--dim);font-size:14px;margin-top:6px}
-#topbtns{position:absolute;right:30px;top:32px}
-.rbtn{display:inline-block;width:44px;height:44px;border-radius:50%;border:1.5px solid var(--line);
-  margin-left:12px;text-align:center;line-height:41px;font-size:20px;color:var(--text);background:#1f2227}
+/* ---------- скло ---------- */
+.glass{position:absolute;border-radius:24px;background:var(--glass);
+  border:1px solid var(--glass-b);
+  box-shadow:inset 0 1px 0 var(--glass-hi),inset 0 -1px 0 rgba(255,255,255,.06),0 12px 34px rgba(0,8,60,.28);
+  -webkit-backdrop-filter:blur(26px) saturate(170%);backdrop-filter:blur(26px) saturate(170%)}
+body.lite .glass,body.lite #dock,body.lite .ov,body.lite .sheet{-webkit-backdrop-filter:none;backdrop-filter:none}
+body.lite .glass{background:rgba(18,36,140,.55)}
+.lbl{font-size:12px;font-weight:600;letter-spacing:.6px;text-transform:uppercase;color:var(--dim)}
 
-/* clock */
-#clock{position:absolute;left:28px;top:118px;font-family:Roboto,"Helvetica Neue",Arial,sans-serif;
-  font-weight:300;font-size:132px;line-height:1;letter-spacing:4px}
-#datew{position:absolute;left:418px;top:138px;font-size:19px;line-height:1.75}
-#datew .dim{color:var(--dim)}
+/* ---------- верхня панель + «шторка» ---------- */
+#menubar{position:absolute;left:0;top:0;width:1280px;height:30px;background:#000;z-index:20;
+  font-size:13.5px;line-height:30px;padding:0 18px;white-space:nowrap}
+#mbL{float:left} #mbL b{font-weight:700;margin-right:20px} #mbL span{margin-right:18px;color:rgba(255,255,255,.88)}
+#mbR{float:right} #mbR span{margin-left:16px;color:rgba(255,255,255,.92)}
+#mbR svg{width:15px;height:15px;vertical-align:-2px;fill:#fff}
+#mbAlert i{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--green);margin-right:6px;vertical-align:0}
+#mbAlert.on i{background:var(--red);box-shadow:0 0 8px var(--red)}
+#mbAlert.stale i{background:var(--orange)}
+#notch{position:absolute;left:50%;top:0;width:196px;height:34px;margin-left:-98px;background:#000;z-index:21;
+  border-radius:0 0 18px 18px;overflow:hidden;transition:width .45s cubic-bezier(.2,.9,.25,1.15),height .45s cubic-bezier(.2,.9,.25,1.15),margin-left .45s cubic-bezier(.2,.9,.25,1.15)}
+#notch .cam{position:absolute;left:50%;top:11px;width:10px;height:10px;margin-left:-5px;border-radius:50%;
+  background:radial-gradient(circle at 35% 35%,#2b3a63 0%,#0b0f1c 55%,#000 100%);box-shadow:0 0 0 1px #111}
+#notch .nt{position:absolute;left:0;right:0;top:34px;text-align:center;font-size:17px;font-weight:600;white-space:nowrap;
+  opacity:0;transition:opacity .25s}
+#notch.wide{width:560px;margin-left:-280px;height:78px;border-radius:0 0 30px 30px}
+#notch.wide .nt{opacity:1;transition-delay:.18s}
+#notch.alarm{width:470px;margin-left:-235px;height:34px;border-radius:0 0 18px 18px}
+#notch.alarm .nt{top:0;line-height:32px;font-size:14px;opacity:1;color:#ff6b61}
+#notch.alarm .nt .nl{position:absolute;left:20px} #notch.alarm .nt .nr{position:absolute;right:20px;color:#fff}
+#notch.alarm .nt b{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--red);margin-right:8px;vertical-align:0;animation:pulse .8s infinite alternate}
+#toast{display:none}
 
-/* terminal */
-#term{position:absolute;left:30px;top:270px;width:640px;font-size:17px;line-height:1.75}
-.dot{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:12px;vertical-align:0}
-.g{background:var(--green)} .a{background:var(--amber)} .r{background:var(--red)}
-#status{font-size:19px}
-#status.alert{color:#ffb1aa}
-#log{margin-top:10px;height:116px;overflow:hidden}
-#log p{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#log .t{color:var(--dim)}
-#spin{color:var(--accent);margin-top:4px}
-#spin small{color:var(--dim);font-size:14px;margin-left:8px}
-#prompt{position:absolute;left:28px;top:536px;width:640px;padding:9px 18px;font-size:15px;color:var(--dim);
-  border:1.5px solid var(--line);border-radius:10px}
-#prompt span{color:var(--text);margin-right:14px}
+/* ---------- віджети ---------- */
+#wClock{left:28px;top:52px;width:300px;height:176px;padding:18px 22px}
+#hi{font-size:15px;color:var(--dim);font-weight:500}
+#clock{font-size:84px;font-weight:200;letter-spacing:-1px;line-height:1;margin-top:8px}
+#date{font-size:16px;color:var(--dim);margin-top:10px}
 
-/* map */
-#map{position:absolute;right:30px;top:96px;width:548px;height:430px;padding:16px 20px}
-#map h3{font-size:16px;font-weight:bold}
-#map h3 i{color:var(--accent);font-style:normal;margin-right:8px}
-#map h3 span{color:var(--dim);font-weight:normal;font-size:14px}
-#grid{position:relative;margin-top:10px;height:340px}
-#grid svg{width:508px;height:340px;display:block}
-#grid path{fill:#2c3038;stroke:#14161a;stroke-width:.8;stroke-linejoin:round;transition:fill .4s}
-#grid path.p{fill:#a8792c}
-#grid path.f{fill:#c2403a}
-#grid path.u{fill:#d9772f}
-#grid path.home{stroke:#ffffff;stroke-width:2}
-#grid text{font-family:Roboto,Arial,sans-serif;font-size:9px;fill:rgba(255,255,255,.55);text-anchor:middle;pointer-events:none}
-#grid circle{fill:#59606c;stroke:#e9e6df;stroke-width:1.6}
-#grid circle.on{fill:#ff5a4e}
-#grid circle.home{stroke:#fff;stroke-width:2.6}
-#legend{position:absolute;left:20px;bottom:14px;font-size:13px;color:var(--dim)}
-#legend span{margin-right:18px}
-#legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px}
-#map.fc.on{transform:none;box-shadow:0 0 0 3px var(--focus)}
+#wWeather{left:340px;top:52px;width:180px;height:176px;padding:16px 18px;
+  background:linear-gradient(160deg,rgba(80,150,255,.42),rgba(20,60,200,.30))}
+#wCity{font-size:14px;font-weight:600}
+#wTemp{font-size:54px;font-weight:300;line-height:1;margin-top:6px}
+#wIco{font-size:22px;margin-top:10px;line-height:1}
+#wCond{font-size:13px;font-weight:600;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#wHL{font-size:13px;color:var(--dim);margin-top:2px}
+
+#wCal{left:532px;top:52px;width:180px;height:176px;padding:14px 14px}
+#calM{font-size:12px;font-weight:700;color:#ff6b61;text-transform:uppercase;letter-spacing:.6px;padding-left:4px}
+#calG{display:table;width:100%;margin-top:6px;border-collapse:collapse}
+#calG div{display:table-row}
+#calG span{display:table-cell;width:14.28%;text-align:center;font-size:11px;line-height:19px;font-weight:600}
+#calG .h span{color:var(--faint);font-size:10px}
+#calG span.we{color:var(--dim)}
+#calG span.td{color:#fff;background:var(--red);border-radius:50%}
+
+#term{left:28px;top:240px;width:684px;height:226px;padding:18px 24px}
+#term .lbl svg{width:13px;height:13px;vertical-align:-2px;margin-right:6px;fill:var(--dim)}
+#status{font-size:26px;font-weight:600;margin-top:10px;letter-spacing:-.2px}
+#status.alert{color:#ff8a82}
+.dot{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:12px;vertical-align:1px}
+.g{background:var(--green);box-shadow:0 0 10px rgba(50,215,75,.7)} .a{background:var(--orange)} .r{background:var(--red);box-shadow:0 0 10px rgba(255,69,58,.8)}
+#log{margin-top:14px;height:96px;overflow:hidden;font-size:15px;line-height:24px}
+#log p{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:rgba(255,255,255,.9)}
+#log .dot{width:8px;height:8px;margin-right:10px;box-shadow:none}
+#log .t{color:var(--dim);margin-right:8px;font-variant-numeric:tabular-nums}
+#spin{position:absolute;left:24px;right:24px;bottom:14px;font-size:13px;color:var(--faint)}
+#spin small{margin-left:6px;font-size:13px}
+
+/* ---------- мапа ---------- */
+#map{left:724px;top:52px;width:528px;height:414px;padding:14px 16px}
+#map h3{font-size:15px;font-weight:700}
+#map h3 span{color:var(--dim);font-weight:500}
+#grid{position:relative;margin-top:8px;height:331px}
+#grid svg{width:494px;height:331px;display:block}
+#grid path{fill:rgba(255,255,255,.16);stroke:rgba(255,255,255,.42);stroke-width:.7;stroke-linejoin:round;transition:fill .4s}
+#grid path.p{fill:rgba(255,159,10,.85)}
+#grid path.f{fill:rgba(255,69,58,.88)}
+#grid path.u{fill:rgba(255,80,64,.85)}
+#grid path.home{stroke:#fff;stroke-width:2.2}
+#grid text{font-size:9px;font-weight:600;fill:rgba(255,255,255,.75);text-anchor:middle;pointer-events:none}
+#grid circle{fill:rgba(255,255,255,.35);stroke:#fff;stroke-width:1.6}
+#grid circle.on{fill:var(--red)}
+#grid circle.home{stroke-width:2.6}
+#legend{position:absolute;left:16px;bottom:12px;font-size:12px;color:var(--dim)}
+#legend span{margin-right:16px}
+#legend i{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:6px;vertical-align:-1px}
 #map.ext #grid svg,#map.ext #legend{visibility:hidden}
-#src{position:absolute;right:20px;top:19px;max-width:300px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:12px;color:#5d616a}
+#src{position:absolute;right:16px;top:16px;max-width:250px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:11px;color:var(--faint)}
 
-/* dock */
-#dock{position:absolute;left:24px;right:24px;bottom:22px;height:118px;border-radius:26px;
-  background:linear-gradient(#2e323a,#22252b);border:1.5px solid #474c56;padding:18px 24px;white-space:nowrap;overflow:hidden}
-#dockin{position:relative;transition:transform .2s}
-.app{display:inline-block;vertical-align:top;width:132px;height:80px;margin-right:14px;border-radius:14px;
-  background:#363a43;overflow:hidden;position:relative;transition:transform .12s}
-.app img{width:100%;height:100%;object-fit:cover}
-.app img.ic{width:52px;height:52px;object-fit:contain;position:absolute;left:40px;top:7px}
-.app .lb{position:absolute;left:0;right:0;bottom:4px;text-align:center;font-family:Roboto,Arial,sans-serif;font-size:12px;color:#e6e6e6}
-.app.ph{font-family:Roboto,Arial,sans-serif;font-weight:bold;font-size:17px;line-height:80px;text-align:center}
-.fc.on{outline:none;transform:scale(1.09);box-shadow:0 0 0 3px var(--focus),0 6px 22px rgba(0,0,0,.6);z-index:3}
-.rbtn.on{border-color:var(--focus);background:#3a3f49}
+/* ---------- фокус ---------- */
+.glass.fc.on{box-shadow:0 0 0 3px rgba(255,255,255,.95),0 14px 40px rgba(0,8,60,.4)}
 
-/* overlays */
-.ov{position:absolute;left:0;top:0;width:1280px;height:720px;background:rgba(12,13,16,.985);display:none;padding:40px 54px}
+/* ---------- док ---------- */
+#dock{position:absolute;left:50%;bottom:40px;height:92px;padding:11px 12px;border-radius:30px;white-space:nowrap;
+  -webkit-transform:translateX(-50%);transform:translateX(-50%);
+  background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.34);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.45),0 16px 40px rgba(0,8,60,.35);
+  -webkit-backdrop-filter:blur(30px) saturate(180%);backdrop-filter:blur(30px) saturate(180%)}
+body.lite #dock{background:rgba(18,36,140,.6)}
+#dockwrap{display:inline-block;vertical-align:top;max-width:900px;overflow:visible;position:relative}
+#dockclip{overflow:hidden;padding:74px 10px 0;margin:-74px -10px 0}
+#dockin{position:relative;transition:transform .2s;white-space:nowrap}
+.app{display:inline-block;vertical-align:top;width:70px;height:70px;margin:0 5px;border-radius:17px;position:relative;
+  -webkit-transition:-webkit-transform .16s;transition:transform .16s}
+.app .ico{width:70px;height:70px;border-radius:17px;overflow:hidden;background:#2b3240;box-shadow:0 3px 8px rgba(0,0,0,.25)}
+.app .ico img{width:100%;height:100%;object-fit:cover;display:block}
+.app .ico img.ic{object-fit:contain;padding:6px;background:#fff}
+.app .ico.tr{background:transparent;box-shadow:none} .app .ico.tr img.ic{padding:0;background:transparent}
+.app .ico.ph{font-size:30px;font-weight:700;line-height:70px;text-align:center;color:#fff}
+.app .lb{position:absolute;left:50%;bottom:86px;-webkit-transform:translateX(-50%);transform:translateX(-50%);padding:4px 11px;border-radius:9px;
+  background:rgba(30,30,40,.82);font-size:13px;font-weight:500;white-space:nowrap;display:none}
+.app .run{position:absolute;left:50%;bottom:-8px;width:5px;height:5px;margin-left:-2.5px;border-radius:50%;background:rgba(255,255,255,.85);display:none}
+.app.on{-webkit-transform:translateY(-10px) scale(1.2);transform:translateY(-10px) scale(1.2);z-index:3}
+.app.on .lb{display:block;-webkit-transform:translateX(-50%) scale(.84);transform:translateX(-50%) scale(.84)}
+.app.on .run{display:block}
+.app.on .ico{box-shadow:0 0 0 2.5px #fff,0 8px 18px rgba(0,0,0,.4)}
+#dsep{display:inline-block;vertical-align:top;width:1px;height:58px;margin:6px 10px 0;background:rgba(255,255,255,.35)}
+.sys .ico{display:block}
+.sys svg{width:70px;height:70px;display:block}
+#hint{position:absolute;left:0;right:0;bottom:12px;text-align:center;font-size:12px;color:rgba(255,255,255,.62)}
+#hint b{font-weight:600;color:#fff;margin:0 4px}
+
+/* ---------- оверлеї (Launchpad і Налаштування) ---------- */
+.ov{position:absolute;left:0;top:0;width:1280px;height:720px;display:none;padding:58px 60px 30px;z-index:10;
+  background:rgba(4,14,80,.55);-webkit-backdrop-filter:blur(34px) saturate(150%);backdrop-filter:blur(34px) saturate(150%)}
+body.lite .ov{background:rgba(6,16,80,.94)}
 .ov.show{display:block}
-.ov h2{font-size:24px;margin-bottom:6px}
-.ov h2 i{color:var(--accent);font-style:normal;margin-right:10px}
-.ov .hint{color:var(--dim);font-size:14px;margin-bottom:22px}
-#allgrid{position:relative;height:548px;overflow:hidden;padding:10px;margin:0 -10px}
-#allin{display:grid;grid-template-columns:repeat(6,176px);grid-gap:18px;transition:transform .2s}
-.ga{height:118px;border-radius:14px;background:#2a2d34;position:relative;overflow:hidden;text-align:center}
-.ga img{width:60px;height:60px;object-fit:contain;margin-top:14px}
-.ga div{font-family:Roboto,Arial,sans-serif;font-size:13px;color:#ddd;padding:6px 8px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ga .star{position:absolute;right:10px;top:6px;color:var(--accent);font-size:18px}
-.btn{display:inline-block;padding:10px 18px;border-radius:10px;border:1.5px solid var(--line);background:#24272d;
-  font-size:15px;margin:0 10px 12px 0;color:var(--text)}
-.btn.sel{border-color:var(--accent);color:var(--accent)}
-#regs{display:grid;grid-template-columns:repeat(5,226px);grid-gap:10px;margin-top:8px}
+.ov h2{font-size:28px;font-weight:700;letter-spacing:-.3px}
+.ov .hint{color:var(--dim);font-size:14px;margin:4px 0 18px}
+#allgrid{position:relative;height:486px;overflow:hidden;padding:14px;margin:0 -14px}
+#allin{display:grid;grid-template-columns:repeat(8,128px);grid-gap:12px 14px;transition:transform .2s;justify-content:center}
+.ga{height:132px;border-radius:20px;position:relative;text-align:center;padding-top:10px}
+.ga img{width:76px;height:76px;object-fit:contain;border-radius:18px}
+.ga div{font-size:13px;color:#fff;padding:7px 6px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 3px rgba(0,0,0,.4)}
+.ga .gph{display:inline-block;width:76px;height:76px;border-radius:18px;font-size:34px;font-weight:700;line-height:76px;color:#fff}
+.ga .star{position:absolute;right:16px;top:4px;color:#ffd60a;font-size:18px}
+.ga.on{background:rgba(255,255,255,.2);box-shadow:0 0 0 2.5px #fff}
+.btn{display:inline-block;padding:11px 20px;border-radius:14px;font-size:15px;margin:0 10px 12px 0;color:#fff;
+  background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.26);box-shadow:inset 0 1px 0 rgba(255,255,255,.3)}
+.btn.sel{background:var(--blue);border-color:var(--blue)}
+.btn.on{background:#fff;color:#0a1a6e;border-color:#fff}
+#regs{display:grid;grid-template-columns:repeat(6,184px);grid-gap:10px;margin-top:6px}
 #regs .btn{margin:0;text-align:center;font-size:13px;padding:10px 6px;white-space:nowrap}
-.sec{color:var(--dim);font-size:14px;margin:18px 0 8px}
+.sec{margin:16px 0 8px}
 
-#alarm{position:absolute;left:0;top:0;width:1280px;height:720px;display:none;text-align:center;padding-top:200px;
-  background:radial-gradient(circle,#8e1f19 0%,#3d0c0a 75%);font-family:Roboto,Arial,sans-serif}
+#alarm{position:absolute;left:0;top:0;width:1280px;height:720px;display:none;text-align:center;padding-top:210px;z-index:15;
+  background:radial-gradient(circle at 50% 45%,rgba(200,30,22,.92) 0%,rgba(70,6,4,.96) 75%)}
 #alarm.show{display:block}
-#alarm h1{font-size:76px;letter-spacing:2px;animation:pulse .9s infinite alternate}
-#alarm p{font-size:28px;margin-top:18px;opacity:.9}
-@keyframes pulse{from{opacity:1}to{opacity:.55}}
-#toast{position:absolute;left:50%;top:30px;transform:translateX(-50%);padding:12px 26px;border-radius:12px;
-  background:#1f4d2c;border:1.5px solid var(--green);font-size:18px;display:none}
-#toast.show{display:block}
+#alarm h1{font-size:72px;font-weight:800;letter-spacing:1px;animation:pulse .9s infinite alternate}
+#alarm p{font-size:28px;margin-top:18px;opacity:.92}
+@keyframes pulse{from{opacity:1}to{opacity:.5}}
 </style>
 </head>
 <body>
 <div id="stage">
-  <div id="hello" class="box"><b><i>✻</i><span id="hi">Вітаю!</span></b><div>/help — допомога · cwd: ~/вітальня</div></div>
-  <div id="topbtns">
-    <div class="rbtn fc" id="bApps" data-act="apps" title="Усі програми">▦</div><div class="rbtn fc" id="bSet" data-act="settings" title="Налаштування">⚙</div>
+  <svg id="wall" viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid slice">
+    <defs>
+      <linearGradient id="wb" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1630f5"/><stop offset=".55" stop-color="#0a1bd0"/><stop offset="1" stop-color="#0007a6"/></linearGradient>
+      <linearGradient id="w1" x1="0" y1="0" x2="1" y2=".6"><stop offset="0" stop-color="#f4f7ff"/><stop offset=".45" stop-color="#b9cbff"/><stop offset="1" stop-color="#5a7bff"/></linearGradient>
+      <linearGradient id="w2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#030a55"/><stop offset=".6" stop-color="#0716a8"/><stop offset="1" stop-color="#1e3cff"/></linearGradient>
+      <linearGradient id="w3" x1="1" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#dfe8ff"/><stop offset=".5" stop-color="#7f9cff"/><stop offset="1" stop-color="#2140ff"/></linearGradient>
+      <linearGradient id="w4" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#ff9a5a"/><stop offset=".5" stop-color="#ff5fa2"/><stop offset="1" stop-color="#8a7bff"/></linearGradient>
+      <radialGradient id="glow" cx=".72" cy=".2" r=".6"><stop offset="0" stop-color="#a9c2ff" stop-opacity=".55"/><stop offset="1" stop-color="#a9c2ff" stop-opacity="0"/></radialGradient>
+    </defs>
+    <rect width="1280" height="720" fill="url(#wb)"/>
+    <rect width="1280" height="720" fill="url(#glow)"/>
+    <path d="M560 -10 C700 120 860 210 1040 250 C1150 275 1230 300 1300 340 L1300 -10 Z" fill="url(#w3)" opacity=".92"/>
+    <path d="M-20 120 C120 160 260 260 360 420 C440 550 470 650 480 740 L-20 740 Z" fill="url(#w2)"/>
+    <path d="M-20 60 C180 70 360 170 470 330 C560 460 600 600 610 740 L560 740 C540 610 490 480 410 370 C300 220 150 130 -20 110 Z" fill="url(#w1)" opacity=".95"/>
+    <path d="M-20 110 C150 130 300 220 410 370 C490 480 540 610 560 740" fill="none" stroke="url(#w4)" stroke-width="3" opacity=".85"/>
+    <path d="M1300 420 C1120 380 960 420 860 520 C790 590 760 660 750 740 L1300 740 Z" fill="url(#w2)" opacity=".9"/>
+    <path d="M1300 380 C1130 340 960 380 850 490 C780 560 745 650 735 740 L755 740 C765 655 800 575 870 510 C970 420 1130 395 1300 430 Z" fill="url(#w1)" opacity=".9"/>
+    <path d="M610 740 C640 560 760 420 900 360" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="1.5"/>
+  </svg>
+
+  <div id="menubar">
+    <div id="mbL"><b>✻ Вітальня</b><span>Тривоги</span><span>Програми</span><span>Вигляд</span></div>
+    <div id="mbR">
+      <span id="mbAlert"><i></i><em id="mbAlertTxt" style="font-style:normal">—</em></span>
+      <span id="mbWeather">—</span>
+      <span><svg viewBox="0 0 24 24"><path d="M12 18.5a1.6 1.6 0 1 0 0 3.2 1.6 1.6 0 0 0 0-3.2zM12 13c-2 0-3.8.8-5.1 2.1l1.6 1.6c.9-.9 2.1-1.4 3.5-1.4s2.6.5 3.5 1.4l1.6-1.6C15.8 13.8 14 13 12 13zm0-4.6c-3.3 0-6.3 1.3-8.5 3.5l1.6 1.6C6.9 11.7 9.3 10.6 12 10.6s5.1 1.1 6.9 2.9l1.6-1.6C18.3 9.7 15.3 8.4 12 8.4zm0-4.6C7.4 3.8 3.3 5.6.3 8.6l1.6 1.6C4.5 7.6 8.1 6 12 6s7.5 1.6 10.1 4.2l1.6-1.6C20.7 5.6 16.6 3.8 12 3.8z"/></svg></span>
+      <span id="mbTime">—</span>
+    </div>
+  </div>
+  <div id="notch"><div class="cam"></div><div class="nt" id="notchTxt"></div></div>
+  <div id="toast"></div>
+
+  <div id="wClock" class="glass">
+    <div id="hi">Вітаю!</div>
+    <div id="clock">--:--</div>
+    <div id="date">—</div>
   </div>
 
-  <div id="clock">--:--</div>
-  <div id="datew"><div id="date">—</div><div id="weather" class="dim">погода завантажується…</div></div>
+  <div id="wWeather" class="glass">
+    <div id="wCity">Київ</div>
+    <div id="wTemp">--°</div>
+    <div id="wIco">☁️</div>
+    <div id="wCond">завантаження…</div>
+    <div id="wHL"></div>
+  </div>
 
-  <div id="term">
+  <div id="wCal" class="glass"><div id="calM"></div><div id="calG"></div></div>
+
+  <div id="term" class="glass">
+    <div class="lbl"><svg viewBox="0 0 24 24"><path d="M12 2 1 21h22L12 2zm1 15h-2v-2h2v2zm0-4h-2V9h2v4z"/></svg>Повітряна тривога</div>
     <div id="status"><span class="dot a"></span>перевіряю тривоги…</div>
     <div id="log"></div>
     <div id="spin">✻ <span id="spinTxt">Шукаю сонце…</span><small id="spinT"></small></div>
   </div>
-  <div id="prompt"><span>&gt;</span>←→ вибір · OK запуск · ▦ усі програми · ⚙ налаштування</div>
 
-  <div id="map" class="box fc" data-act="mapfull">
-    <h3><i>✻</i>Тривоги зараз <span id="mapCnt">· —</span></h3>
+  <div id="map" class="glass fc" data-act="mapfull">
+    <h3>Тривоги зараз <span id="mapCnt">· —</span></h3>
     <div id="grid"></div>
-    <div id="legend"><span><i style="background:#c2403a"></i>тривога</span><span><i style="background:#a8792c"></i>частково</span><span><i style="background:#2c3038"></i>спокійно</span></div>
+    <div id="legend"></div>
     <div id="src"></div>
   </div>
 
-  <div id="dock"><div id="dockin"></div></div>
+  <div id="dock">
+    <div id="dockwrap"><div id="dockclip"><div id="dockin"></div></div></div><div id="dsep"></div><div class="app sys fc" id="bApps" data-act="apps"><div class="ico tr"><svg viewBox="0 0 70 70"><defs><linearGradient id="lp" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff7a59"/><stop offset=".5" stop-color="#c04dff"/><stop offset="1" stop-color="#2f6bff"/></linearGradient></defs><rect width="70" height="70" rx="17" fill="url(#lp)"/><g fill="#fff" opacity=".95"><rect x="15" y="15" width="10" height="10" rx="3"/><rect x="30" y="15" width="10" height="10" rx="3"/><rect x="45" y="15" width="10" height="10" rx="3"/><rect x="15" y="30" width="10" height="10" rx="3"/><rect x="30" y="30" width="10" height="10" rx="3"/><rect x="45" y="30" width="10" height="10" rx="3"/><rect x="15" y="45" width="10" height="10" rx="3"/><rect x="30" y="45" width="10" height="10" rx="3"/><rect x="45" y="45" width="10" height="10" rx="3"/></g></svg></div><div class="lb">Усі програми</div><div class="run"></div></div><div class="app sys fc" id="bSet" data-act="settings"><div class="ico tr"><svg viewBox="0 0 70 70"><defs><linearGradient id="gs" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e6e8ee"/><stop offset="1" stop-color="#8e939f"/></linearGradient></defs><rect width="70" height="70" rx="17" fill="url(#gs)"/><circle cx="35" cy="35" r="21" fill="#4a4f5a"/><g fill="#d8dbe2"><path d="M35 17l3 6h-6zM35 53l-3-6h6zM17 35l6-3v6zM53 35l-6 3v-6zM22.3 22.3l6.4 2.1-4.2 4.2zM47.7 47.7l-6.4-2.1 4.2-4.2zM47.7 22.3l-2.1 6.4-4.2-4.2zM22.3 47.7l2.1-6.4 4.2 4.2z"/></g><circle cx="35" cy="35" r="12" fill="#d8dbe2"/><circle cx="35" cy="35" r="6" fill="#4a4f5a"/></svg></div><div class="lb">Налаштування</div><div class="run"></div></div>
+  </div>
+  <div id="hint"><b>← →</b>вибір · <b>OK</b>відкрити · <b>↑</b>мапа · <b>Назад</b>до доку</div>
 
   <div id="ovApps" class="ov">
-    <h2><i>✻</i>Усі програми</h2>
+    <h2>Усі програми</h2>
     <div class="hint" id="appsHint">OK — запустити · Назад — закрити</div>
     <div><span class="btn fc" id="bEdit" data-act="edit">✎ Редагувати док: вимк.</span></div>
     <div id="allgrid"><div id="allin"></div></div>
   </div>
 
   <div id="ovSet" class="ov">
-    <h2><i>✻</i>Налаштування</h2>
+    <h2>Налаштування</h2>
     <div class="hint">Назад — закрити</div>
     <div>
       <span class="btn fc" data-act="sound" id="bSound">🔔 Звук тривоги: увімк.</span>
+      <span class="btn fc" data-act="glass" id="bGlass">✨ Скло: розмите</span>
       <span class="btn fc" data-act="reload">⟳ Оновити дані</span>
       <span class="btn fc" data-act="android">⚙ Налаштування Android</span>
       <span class="btn fc" data-act="mapmode" id="bMap">🗺 Мапа: ukrainealarm</span>
     </div>
-    <div class="sec">Запуск:</div>
+    <div class="sec lbl">Запуск</div>
     <div>
       <span class="btn fc" data-act="home" id="bHome">🏠 Зробити головним екраном</span>
       <span class="btn fc" data-act="homeset">Налаштування головного екрана</span>
       <span class="btn fc" data-act="autostart" id="bAuto">⏻ Автозапуск при ввімкненні</span>
     </div>
-    <div class="sec">Мій регіон (для статусу й сповіщень):</div>
+    <div class="sec lbl">Мій регіон — для статусу й сповіщень</div>
     <div id="regs"></div>
   </div>
 
   <div id="alarm"><h1>ПОВІТРЯНА ТРИВОГА</h1><p id="alarmWhere"></p><p style="font-size:22px;margin-top:40px;opacity:.7">Пройдіть до укриття · будь-яка кнопка — закрити</p></div>
-  <div id="toast"></div>
 </div>
 
 <script>
@@ -204,7 +304,8 @@ var DEMO = /demo/.test(location.search);
 /* ---------- сховище ---------- */
 function load(k,d){ try{ var v = HAS_BRIDGE ? Android.load(k) : localStorage.getItem(k); return v ? JSON.parse(v) : d; }catch(e){ return d; } }
 function save(k,v){ try{ var s=JSON.stringify(v); if(HAS_BRIDGE) Android.save(k,s); else localStorage.setItem(k,s); }catch(e){} }
-var state = { home: load("home", CONFIG.homeRegion), sound: load("sound", true), pins: load("pins", null), mapMode: load("mapMode2", "own") };
+var state = { home: load("home", CONFIG.homeRegion), sound: load("sound", true), pins: load("pins", null), mapMode: load("mapMode2", "own"), lite: load("lite", false) };
+if(state.lite) document.body.className="lite";
 
 /* ---------- масштаб під екран ---------- */
 function fit(){ var s=Math.min(innerWidth/1280, innerHeight/720); var st=$("stage");
@@ -224,11 +325,27 @@ function httpGet(url,headers){
 var DAYS=["неділя","понеділок","вівторок","середа","четвер","пʼятниця","субота"];
 var MONTHS=["січня","лютого","березня","квітня","травня","червня","липня","серпня","вересня","жовтня","листопада","грудня"];
 function pad(n){return (n<10?"0":"")+n}
-function tick(){ var d=new Date(); $("clock").textContent=pad(d.getHours())+":"+pad(d.getMinutes());
-  $("date").textContent=DAYS[d.getDay()]+", "+d.getDate()+" "+MONTHS[d.getMonth()]; }
+var SDAYS=["нд","пн","вт","ср","чт","пт","сб"], SMON=["січ.","лют.","бер.","квіт.","трав.","черв.","лип.","серп.","вер.","жовт.","лист.","груд."];
+var MNAMES=["Січень","Лютий","Березень","Квітень","Травень","Червень","Липень","Серпень","Вересень","Жовтень","Листопад","Грудень"];
+var calDay=-1;
+function renderCal(d){
+  var y=d.getFullYear(), m=d.getMonth(), first=(new Date(y,m,1).getDay()+6)%7, days=new Date(y,m+1,0).getDate();
+  var h='<div class="h"><span>пн</span><span>вт</span><span>ср</span><span>чт</span><span>пт</span><span>сб</span><span>нд</span></div>', c=0, row="";
+  for(var i=0;i<first;i++){ row+="<span></span>"; c++; }
+  for(var n=1;n<=days;n++){ var wd=c%7; row+='<span class="'+(n===d.getDate()?"td":(wd>=5?"we":""))+'">'+n+"</span>"; c++;
+    if(c%7===0){ h+="<div>"+row+"</div>"; row=""; } }
+  if(row){ while(c%7){ row+="<span></span>"; c++; } h+="<div>"+row+"</div>"; }
+  $("calM").textContent=MNAMES[m]+" "+y; $("calG").innerHTML=h; }
+function greet(){ var h=new Date().getHours();
+  $("hi").textContent=(h<5?"Доброї ночі":h<12?"Доброго ранку":h<18?"Доброго дня":"Доброго вечора")+(CONFIG.name?", "+CONFIG.name:""); }
+function tick(){ var d=new Date(), hm=pad(d.getHours())+":"+pad(d.getMinutes());
+  $("clock").textContent=hm;
+  var dn=DAYS[d.getDay()]; $("date").textContent=dn.charAt(0).toUpperCase()+dn.slice(1)+", "+d.getDate()+" "+MONTHS[d.getMonth()];
+  $("mbTime").textContent=SDAYS[d.getDay()]+" "+d.getDate()+" "+SMON[d.getMonth()]+"  "+hm;
+  if(calDay!==d.getDate()){ calDay=d.getDate(); renderCal(d); }
+  if(d.getSeconds()===0) greet(); }
 setInterval(tick,1000); tick();
-var h=new Date().getHours();
-$("hi").textContent=(h<5?"Доброї ночі":h<12?"Доброго ранку":h<18?"Доброго дня":"Доброго вечора")+(CONFIG.name?", "+CONFIG.name:"")+"!";
+greet();
 
 /* ---------- погода (Open-Meteo, без ключа) ---------- */
 function wcode(c){ if(c===0)return"ясно"; if(c<=2)return"мінлива хмарність"; if(c===3)return"хмарно"; if(c<=48)return"туман";
@@ -236,12 +353,20 @@ function wcode(c){ if(c===0)return"ясно"; if(c<=2)return"мінлива хм
 function loadWeather(){
   var u="https://api.open-meteo.com/v1/forecast?latitude="+CONFIG.lat+"&longitude="+CONFIG.lon+
     "&current=temperature_2m,weather_code&daily=temperature_2m_max,temperature_2m_min&timezone=Europe%2FKyiv&forecast_days=1";
-  if(DEMO){ $("weather").textContent="12° · хмарно · 13°/7°"; return; }
+  $("wCity").textContent=CONFIG.city;
+  if(DEMO){ showWeather(12,3,13,7); return; }
   httpGet(u).then(function(r){ try{ var j=JSON.parse(r.body);
-    $("weather").textContent=Math.round(j.current.temperature_2m)+"° · "+wcode(j.current.weather_code)+" · "+
-      Math.round(j.daily.temperature_2m_max[0])+"°/"+Math.round(j.daily.temperature_2m_min[0])+"°";
-  }catch(e){ $("weather").textContent="погода недоступна"; } });
+    showWeather(j.current.temperature_2m,j.current.weather_code,j.daily.temperature_2m_max[0],j.daily.temperature_2m_min[0]);
+  }catch(e){ $("wCond").textContent="погода недоступна"; } });
 }
+function wicon(c){ var n=new Date().getHours(), night=n<6||n>=20;
+  if(c===0) return night?"🌙":"☀️"; if(c<=2) return night?"☁️":"⛅"; if(c===3) return "☁️"; if(c<=48) return "🌫️";
+  if(c<=67||(c>=80&&c<=82)) return "🌧️"; if(c<=77||(c>=85&&c<=86)) return "❄️"; return "⛈️"; }
+function showWeather(t,c,mx,mn){ t=Math.round(t);
+  $("wTemp").textContent=t+"°"; $("wIco").textContent=wicon(c);
+  var cond=wcode(c); $("wCond").textContent=cond.charAt(0).toUpperCase()+cond.slice(1);
+  $("wHL").textContent="Макс.:"+Math.round(mx)+"° Мін.:"+Math.round(mn)+"°";
+  $("mbWeather").textContent=wicon(c)+" "+t+"°"; }
 loadWeather(); setInterval(loadWeather, 15*60*1000);
 
 /* ---------- мапа України (області) ---------- */
@@ -260,12 +385,12 @@ var tiles={};
 var MAP_URL="https://map.ukrainealarm.com/", mapFull=false;
 function syncMap(){
   var useExt = HAS_BRIDGE && state.mapMode==="ual";
-  $("map").className = "box fc"+(useExt?" ext":"")+(focused===$("map")?" on":"");
+  $("map").className = "glass fc"+(useExt?" ext":"")+(focused===$("map")?" on":"");
   if(!HAS_BRIDGE) return;
   var covered = isOpen("ovApps")||isOpen("ovSet")||$("alarm").className==="show";
   if(!useExt || covered){ Android.hideMap(); return; }
   if(mapFull){ Android.showMap(MAP_URL, 0, 0, innerWidth, innerHeight); return; }
-  var m=$("map").getBoundingClientRect(), g=$("grid").getBoundingClientRect(), pad=6*(m.width/548);
+  var m=$("map").getBoundingClientRect(), g=$("grid").getBoundingClientRect(), pad=6*(m.width/528);
   Android.showMap(MAP_URL, m.left+pad, g.top, m.width-2*pad, m.bottom-g.top-pad);
 }
 
@@ -334,14 +459,15 @@ function render(src){
   REGIONS.forEach(function(r){ var s=a[r[0]], t=tiles[r[0]]; if(s) n++; if(!t) return;
     t.setAttribute("class",(s==="f"?"f":s==="p"?"p":s==="u"?"u":"")+(state.home===r[0]?" home":"")); });
   $("legend").innerHTML = String(src||lastSrc).indexOf("ubilling")===0
-    ? '<span><i style="background:#d9772f"></i>тривога в області або її частині</span><span><i style="background:#2c3038"></i>спокійно</span>'
-    : '<span><i style="background:#c2403a"></i>тривога</span><span><i style="background:#a8792c"></i>частково</span><span><i style="background:#2c3038"></i>спокійно</span>';
+    ? '<span><i style="background:#ff5040"></i>тривога в області або її частині</span><span><i style="background:rgba(255,255,255,.3)"></i>спокійно</span>'
+    : '<span><i style="background:#ff453a"></i>тривога</span><span><i style="background:#ff9f0a"></i>частково</span><span><i style="background:rgba(255,255,255,.3)"></i>спокійно</span>';
   if(src) lastSrc=src;
   var cd=$("cityDot"); if(cd) cd.setAttribute("class",(a.kyiv_city?"on":"")+(state.home==="kyiv_city"?" home":""));
   if(a.kyiv_city && !a.kyiv) n++;
   $("mapCnt").textContent="· "+n+(n===1?" регіон":n>=2&&n<=4?" регіони":" регіонів");
   if(src) $("src").textContent=src+" · "+pad(new Date().getHours())+":"+pad(new Date().getMinutes());
   var home=state.home, st=$("status");
+  updateBar(a,home);
   if(isStale()){ st.className=""; st.innerHTML='<span class="dot a"></span>немає даних про тривоги · '+nameOf(home)+(alerts?' · востаннє '+pad(new Date(lastOk).getHours())+":"+pad(new Date(lastOk).getMinutes()):"");
     $("grid").style.opacity=alerts?"0.45":"1"; return; }
   $("grid").style.opacity="1";
@@ -349,6 +475,15 @@ function render(src){
     st.className="alert"; st.innerHTML='<span class="dot r"></span>ТРИВОГА · '+nameOf(home)+(m?" · "+m+" хв":""); }
   else { st.className=""; st.innerHTML='<span class="dot g"></span>тривоги немає · '+nameOf(home); }
 }
+var SHORT={kyiv_city:"Київ"};
+function updateBar(a,home){ var mb=$("mbAlert"), stale=isStale();
+  mb.className = stale ? "stale" : (a[home] ? "on" : "");
+  $("mbAlertTxt").textContent = stale ? "немає даних" : (a[home] ? "Тривога" : "Тиша");
+  var n=$("notch");
+  if(!stale && a[home]){ var since=alertSince[home], m=since?Math.round((Date.now()-since)/60000):0;
+    if(!notchBusy){ $("notchTxt").innerHTML='<span class="nl"><b></b>Тривога</span><span class="nr">'+nameOf(home)+(m?" · "+m+" хв":"")+'</span>'; n.className="alarm"; } }
+  else if(!notchBusy) n.className=""; }
+var notchBusy=false, notchTimer;
 function addLog(html){ logLines.unshift(html); logLines=logLines.slice(0,4); $("log").innerHTML=logLines.map(function(l){return"<p>"+l+"</p>"}).join(""); }
 fetchAlerts(); setInterval(fetchAlerts, 30000); setInterval(function(){ if(alerts) render(); },60000);
 
@@ -363,7 +498,8 @@ var alarmTimer;
 function showAlarm(){ $("alarmWhere").textContent=nameOf(state.home); $("alarm").className="show"; mapFull=false; syncMap(); beep();
   clearTimeout(alarmTimer); alarmTimer=setTimeout(hideAlarm,30000); }
 function hideAlarm(){ $("alarm").className=""; syncMap(); }
-function toast(t){ var e=$("toast"); e.textContent=t; e.className="show"; setTimeout(function(){e.className=""},8000); }
+function toast(t){ var n=$("notch"); $("notchTxt").textContent=t; n.className="wide"; notchBusy=true;
+  clearTimeout(notchTimer); notchTimer=setTimeout(function(){ notchBusy=false; n.className=""; if(alerts) render(); },5000); }
 
 /* ---------- «думки» ---------- */
 var PHR=["Шукаю сонце…","Слухаю небо…","Рахую хмари…","Гріюсь біля роутера…","Заварюю чай…","Вигадую, що подивитись…","Протираю пульт…","Чекаю на відбій…"];
@@ -388,18 +524,23 @@ function appBy(pkg){ for(var i=0;i<APPS.length;i++) if(APPS[i].pkg===pkg) return
 var COLORS=["#e8875a","#d84a3a","#3b82f6","#22a06b","#a855f7","#e0b02f","#14b8a6","#ec4899"];
 function appTile(a,cls){ var d=document.createElement("div"); d.className=cls+" fc"; d.setAttribute("data-pkg",a.pkg);
   if(cls==="app"){
-    if(a.banner){ d.innerHTML='<img src="'+a.banner+'">'; }
-    else if(a.icon){ d.innerHTML='<img class="ic" src="'+a.icon+'"><div class="lb"></div>'; d.querySelector(".lb").textContent=a.label; }
-    else { d.className+=" ph"; d.style.background=COLORS[Math.abs(hash(a.label))%COLORS.length]; d.textContent=a.label; }
+    var ico;
+    if(a.icon) ico='<div class="ico tr"><img class="ic" src="'+a.icon+'"></div>';
+    else if(a.banner) ico='<div class="ico"><img src="'+a.banner+'"></div>';
+    else ico='<div class="ico ph" style="background:'+COLORS[Math.abs(hash(a.label))%COLORS.length]+'"></div>';
+    d.innerHTML=ico+'<div class="lb"></div><div class="run"></div>';
+    d.querySelector(".lb").textContent=a.label;
+    if(!a.icon&&!a.banner) d.querySelector(".ph").textContent=a.label.charAt(0).toUpperCase();
   } else {
-    d.innerHTML=(a.icon?'<img src="'+a.icon+'">':'<img style="visibility:hidden">')+'<div></div>'+(state.pins.indexOf(a.pkg)>=0?'<span class="star">★</span>':'');
+    d.innerHTML=(a.icon?'<img src="'+a.icon+'">':'<span class="gph" style="background:'+COLORS[Math.abs(hash(a.label))%COLORS.length]+'">'+a.label.charAt(0).toUpperCase()+'</span>')+'<div></div>'+(state.pins.indexOf(a.pkg)>=0?'<span class="star">★</span>':'');
     d.querySelector("div").textContent=a.label;
   }
   return d; }
 function hash(s){ var h=0; for(var i=0;i<s.length;i++) h=(h*31+s.charCodeAt(i))|0; return h; }
 function renderDock(){ var c=$("dockin"), keep=focused&&focused.getAttribute("data-pkg"); c.innerHTML="";
   state.pins.forEach(function(p){ var a=appBy(p); if(a) c.appendChild(appTile(a,"app")); });
-  if(!c.children.length){ var e=document.createElement("div"); e.className="app fc ph"; e.setAttribute("data-act","apps"); e.style.width="300px"; e.textContent="+ додати програми"; c.appendChild(e); }
+  if(!c.children.length){ var e=document.createElement("div"); e.className="app fc"; e.setAttribute("data-act","apps");
+    e.innerHTML='<div class="ico ph" style="background:rgba(255,255,255,.2)">+</div><div class="lb">Додати програми</div><div class="run"></div>'; c.appendChild(e); }
   if(!focused||!document.body.contains(focused)) setFocus(c.querySelector("[data-pkg='"+keep+"']")||c.firstChild); }
 function renderAll(){ var c=$("allin"); c.innerHTML=""; APPS.forEach(function(a){ c.appendChild(appTile(a,"ga")); }); }
 function launch(pkg){ if(HAS_BRIDGE) Android.launch(pkg); else toast("Запуск: "+pkg); }
@@ -413,6 +554,7 @@ function closeOv(){ var any=false; ["ovApps","ovSet"].forEach(function(id){ if(i
 function renderRegs(){ var c=$("regs"); c.innerHTML=""; var ids=["kyiv_city"].concat(REGIONS.map(function(r){return r[0]}));
   ids.forEach(function(id){ var b=document.createElement("span"); b.className="btn fc"+(state.home===id?" sel":""); b.setAttribute("data-reg",id); b.textContent=nameOf(id); c.appendChild(b); });
   $("bSound").textContent="🔔 Звук тривоги: "+(state.sound?"увімк.":"вимк.");
+  $("bGlass").textContent="✨ Скло: "+(state.lite?"просте (швидше)":"розмите");
   $("bMap").textContent="🗺 Мапа: "+(state.mapMode==="ual"?"map.ukrainealarm.com (онлайн)":"вбудована Вітальні");
   var isHome=HAS_BRIDGE&&Android.isDefaultHome&&Android.isDefaultHome(), auto=HAS_BRIDGE&&Android.canAutostart&&Android.canAutostart();
   $("bHome").textContent=isHome?"🏠 Головний екран: ✓ Вітальня":"🏠 Зробити головним екраном";
@@ -423,7 +565,7 @@ var focused=null;
 function layer(){ if(isOpen("ovApps")) return $("ovApps"); if(isOpen("ovSet")) return $("ovSet"); return $("stage"); }
 function setFocus(el){ if(!el) return; if(focused) focused.classList.remove("on"); focused=el; el.classList.add("on"); scrollInto(el); }
 function scrollInto(el){
-  if($("dockin").contains(el)){ var dw=$("dock").clientWidth-60, x=el.offsetLeft, w=el.offsetWidth, c=$("dockin");
+  if($("dockin").contains(el)){ var dw=$("dockclip").clientWidth-8, x=el.offsetLeft, w=el.offsetWidth, c=$("dockin");
     var cur=-(parseFloat((c.style.transform||"").replace(/[^-\d.]/g,""))||0); if(x<cur) cur=x; if(x+w>cur+dw) cur=x+w-dw; c.style.transform="translateX("+(-cur)+"px)"; }
   if($("allin").contains(el)){ var y=el.offsetTop, hh=el.offsetHeight, H=528, ai=$("allin");
     var cy=-(parseFloat((ai.style.transform||"").replace(/[^-\d.]/g,""))||0); if(y<cy) cy=y; if(y+hh>cy+H) cy=y+hh-H; ai.style.transform="translateY("+(-cy)+"px)"; }
@@ -451,6 +593,7 @@ function activate(el){ if(!el) return; var pkg=el.getAttribute("data-pkg"), act=
   if(act==="apps") openOv("ovApps");
   if(act==="settings") openOv("ovSet");
   if(act==="edit"){ editMode=!editMode; el.textContent="✎ Редагувати док: "+(editMode?"увімк. (OK — ★ закріпити/зняти)":"вимк."); }
+  if(act==="glass"){ state.lite=!state.lite; save("lite",state.lite); document.body.className=state.lite?"lite":""; renderRegs(); }
   if(act==="sound"){ state.sound=!state.sound; save("sound",state.sound); renderRegs(); }
   if(act==="reload"){ fetchAlerts(); loadWeather(); refreshApps(); toast("⟳ Оновлено"); }
   if(act==="android"&&HAS_BRIDGE) Android.openSettings();
@@ -474,7 +617,7 @@ document.addEventListener("keydown",function(e){
 document.addEventListener("click",function(e){ var t=e.target; while(t&&t!==document&&!(t.classList&&t.classList.contains("fc"))) t=t.parentNode;
   if(t&&t.classList){ setFocus(t); activate(t); } });
 
-setFocus($("bApps")); setTimeout(refreshApps, 50); setTimeout(syncMap, 400);
+setTimeout(refreshApps, 50); setTimeout(syncMap, 400);
 setTimeout(function(){ try{ if(HAS_BRIDGE&&Android.isDefaultHome&&(!Android.isDefaultHome()||!Android.canAutostart())) toast("⚙ Налаштування → «Зробити головним екраном» і «Автозапуск»"); }catch(e){} }, 2500);
 if(DEMO && /alarm/.test(location.search)) setTimeout(showAlarm,300);
 </script>
