@@ -12,6 +12,9 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.AdaptiveIconDrawable;
+import android.media.tv.TvContract;
+import android.media.tv.TvInputInfo;
+import android.media.tv.TvInputManager;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.Paint;
 import android.graphics.Rect;
@@ -391,6 +394,72 @@ public class MainActivity extends Activity {
                     } catch (Throwable ignored) { }
                 }
             });
+        }
+
+        /** Список HDMI-входів телевізора (для діагностики): [{id,label,parent}] */
+        @JavascriptInterface
+        public String hdmiInputs() {
+            JSONArray arr = new JSONArray();
+            try {
+                TvInputManager tim = (TvInputManager) getSystemService(Context.TV_INPUT_SERVICE);
+                if (tim == null) return "[]";
+                for (TvInputInfo info : tim.getTvInputList()) {
+                    JSONObject o = new JSONObject();
+                    o.put("id", info.getId());
+                    o.put("label", String.valueOf(info.loadLabel(MainActivity.this)));
+                    o.put("type", info.getType());
+                    o.put("parent", info.getParentId() == null ? "" : info.getParentId());
+                    arr.put(o);
+                }
+            } catch (Throwable ignored) { }
+            return arr.toString();
+        }
+
+        /**
+         * Перемикає телевізор на HDMI-вхід №n (працює, коли Вітальня встановлена на сам Android-телевізор).
+         * Повертає "ok:<назва>", "notv" (пристрій не має входів ТВ) або "none" (вхід не знайдено).
+         */
+        @JavascriptInterface
+        public String openHdmi(int n, String hint) {
+            try {
+                TvInputManager tim = (TvInputManager) getSystemService(Context.TV_INPUT_SERVICE);
+                if (tim == null) return "notv";
+                List<TvInputInfo> all = tim.getTvInputList();
+                java.util.ArrayList<TvInputInfo> ports = new java.util.ArrayList<>();
+                TvInputInfo pick = null;
+                String h = hint == null ? "" : hint.toLowerCase();
+                for (TvInputInfo info : all) {
+                    if (info.getType() != TvInputInfo.TYPE_HDMI) continue;
+                    String label = String.valueOf(info.loadLabel(MainActivity.this));
+                    if (info.getParentId() != null) {
+                        // пристрій, який телевізор розпізнав через HDMI-CEC (напр. «PlayStation 5»)
+                        if (!h.isEmpty() && label.toLowerCase().contains(h)) pick = info;
+                        continue;
+                    }
+                    ports.add(info);
+                }
+                if (pick == null) {
+                    for (TvInputInfo info : ports) {
+                        String digits = String.valueOf(info.loadLabel(MainActivity.this)).replaceAll("[^0-9]", "");
+                        if (digits.equals(String.valueOf(n))) { pick = info; break; }
+                    }
+                }
+                if (pick == null && ports.size() >= n && n > 0) pick = ports.get(n - 1);
+                if (pick == null) return all.isEmpty() ? "notv" : "none";
+                final Intent i = new Intent(Intent.ACTION_VIEW, TvContract.buildChannelUriForPassthroughInput(pick.getId()));
+                i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                final String label = String.valueOf(pick.loadLabel(MainActivity.this));
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try { startActivity(i); }
+                        catch (Throwable t) { Toast.makeText(MainActivity.this, "Не вдалося відкрити " + label, Toast.LENGTH_SHORT).show(); }
+                    }
+                });
+                return "ok:" + label;
+            } catch (Throwable t) {
+                return "notv";
+            }
         }
 
         @JavascriptInterface
